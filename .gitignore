@@ -1,0 +1,9 @@
+# Ignore files and paths
+
+## Node
+node_modules/
+
+## AI 
+.claude/
+.specify/credentials.json
+.specify/.env
