@@ -2,6 +2,18 @@
 
 ## Node
 node_modules/
+dist/
+build/
+coverage/
+.angular/
+*.log
+
+## OS / editor
+.DS_Store
+Thumbs.db
+*.tmp
+*.swp
+.idea/
 
 ## Environment
 .env
