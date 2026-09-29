@@ -38,7 +38,8 @@ máquina local, no build Docker e no pipeline de release.
 ### III. Versioning & Release Automation
 
 - O versionamento SemVer DEVE ser automatizado com `semantic-release`, executado somente no
-  branch `main`.
+  branch `main`, a cada merge do PR `dev` → `main` (ver Fluxo de branches em Development
+  Workflow & Quality Gates).
 - Os commits DEVEM seguir Conventional Commits. As regras de release são customizadas
   (`releaseRules` do commit-analyzer):
 
@@ -54,11 +55,13 @@ máquina local, no build Docker e no pipeline de release.
 - Cada release DEVE gerar ou atualizar o `CHANGELOG.md` e o campo `version` do `package.json`,
   e commitar os dois de volta no `main`.
 - A publicação no npm DEVE ficar desabilitada (`npmPublish: false`).
-- Commits fora do padrão NÃO DEVEM chegar ao `main`. A validação DEVERIA ser automática (ex.:
-  commitlint configurado para aceitar os tipos customizados `hotfix` e `breaking`).
+- Commits fora do padrão NÃO DEVEM entrar em `dev` nem em `main`, já que todo commit de `dev`
+  chega ao `main` no merge. A validação DEVERIA ser automática (ex.: commitlint configurado para
+  aceitar os tipos customizados `hotfix` e `breaking`).
 
 **Rationale**: a versão sai dos commits de forma determinística, sem bump manual, e o histórico
-vira um changelog legível.
+vira um changelog legível. Como cada release agrega vários commits de `dev`, a trilha SemVer
+fica mais completa do que com uma release por commit.
 
 ### IV. Environment & Security
 
@@ -162,7 +165,19 @@ de execução reproduzíveis fazem parte da entrega.
   Constitution Check) → `/speckit-tasks` → `/speckit-implement`.
 - Todo código gerado por IA DEVE ser revisado pelo autor antes do commit. Ajustes, correções ou
   descartes relevantes DEVEM ser registrados na seção 5 do `DESENVOLVIMENTO.md`.
-- Antes de qualquer integração no `main`, todos os gates abaixo DEVEM ser atendidos:
+- **Fluxo de branches**:
+  - Todo desenvolvimento DEVE acontecer em `dev` ou em branches de feature criadas a partir de
+    `dev` (ex.: as branches `NNN-nome` do Spec Kit), que voltam para `dev` quando concluídas.
+  - O `main` só recebe merges de Pull Request `dev` → `main` e os commits de release gerados
+    pelo próprio `semantic-release` (`chore(release): ...`). Commits diretos de desenvolvimento
+    no `main` NÃO DEVEM acontecer.
+  - O PR `dev` → `main` DEVE ser integrado com merge commit. Squash e rebase NÃO DEVEM ser
+    usados: o squash junta num só os commits que o `semantic-release` analisa, e o rebase
+    reescreve os hashes e faz `dev` divergir de `main`.
+  - Depois de cada release, o `main` DEVE ser mergeado de volta em `dev`, para trazer o commit
+    de release (`CHANGELOG.md`, `package.json`) e evitar conflitos no próximo PR.
+  - A proteção de branch do GitHub DEVERIA exigir PR para o `main`.
+- Antes de mergear o PR `dev` → `main`, todos os gates abaixo DEVEM ser atendidos:
   1. Os commits seguem Conventional Commits com os tipos do Princípio III.
   2. O build TypeScript em modo `strict` (`pnpm build`) passa sem erros no backend e no
      frontend.
@@ -188,4 +203,4 @@ de execução reproduzíveis fazem parte da entrega.
   Complexity Tracking do plano. No `/speckit-analyze`, conflitos com esta constituição são
   sempre CRITICAL.
 
-**Version**: 1.0.0 | **Ratified**: 2026-09-29 | **Last Amended**: 2026-09-29
+**Version**: 1.1.0 | **Ratified**: 2026-09-29 | **Last Amended**: 2026-09-29
