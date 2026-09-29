@@ -1,0 +1,304 @@
+openapi: 3.1.0
+info:
+  title: CIEE-PR Challenge - API de Candidatos
+  version: 1.0.0
+  description: |
+    Contrato HTTP entre o frontend Angular e o backend Node.js.
+    Todas as rotas ficam sob `/api`. No Docker, o frontend chama `/api/...` no mesmo host, e o
+    Nginx encaminha para `backend:3000` (research R11).
+    Mensagens (`message`) estão sempre em pt-BR e são seguras para exibir ao usuário (FR-030).
+servers:
+  - url: http://localhost:3000
+    description: Backend direto
+  - url: http://localhost:4200
+    description: Via Nginx do frontend (proxy de /api)
+
+paths:
+  /api/health:
+    get:
+      operationId: getHealth
+      summary: Verifica se a API e o banco estão disponíveis
+      responses:
+        '200':
+          description: API e banco disponíveis
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, database]
+                properties:
+                  status: { type: string, const: ok }
+                  database: { type: string, const: up }
+        '503':
+          description: Banco indisponível
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+  /api/candidates:
+    get:
+      operationId: listCandidates
+      summary: Lista todos os candidatos, do mais recente para o mais antigo (FR-025)
+      responses:
+        '200':
+          description: Lista (pode ser vazia)
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/CandidateSummary' }
+    post:
+      operationId: createCandidate
+      summary: Cadastra um candidato (mesmas regras nos modos manual e com PDF)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CandidateInput' }
+            examples:
+              minimo:
+                value: { fullName: 'Maria Souza', email: 'maria@example.com' }
+              completo:
+                value:
+                  fullName: 'Conceição Aparecida da Silva'
+                  email: 'conceicao.silva@example.com'
+                  phone: '(41) 99876-5432'
+                  areaOfInterest: 'Recursos Humanos'
+                  professionalSummary: "Analista de RH.\nOito anos em recrutamento."
+      responses:
+        '201':
+          description: Cadastro salvo (o frontend exibe a confirmação de sucesso, FR-010)
+          headers:
+            Location:
+              schema: { type: string, example: /api/candidates/42 }
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Candidate' }
+        '400':
+          description: Um ou mais campos inválidos (FR-008, FR-009)
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+              example:
+                error:
+                  code: VALIDATION_ERROR
+                  message: 'Alguns campos precisam de correção.'
+                  fields:
+                    - field: email
+                      code: INVALID_EMAIL
+                      message: 'Informe um e-mail válido, como nome@empresa.com.'
+        '409':
+          description: E-mail já cadastrado (FR-012)
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+              example:
+                error:
+                  code: EMAIL_ALREADY_EXISTS
+                  message: 'Já existe um candidato com este e-mail.'
+                  fields:
+                    - field: email
+                      code: EMAIL_ALREADY_EXISTS
+                      message: 'Já existe um candidato com este e-mail.'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/candidates/{id}:
+    get:
+      operationId: getCandidate
+      summary: Detalhes completos de um candidato (FR-026)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer, minimum: 1 }
+      responses:
+        '200':
+          description: Candidato encontrado
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Candidate' }
+        '404':
+          description: Candidato inexistente, ou id que não é um inteiro positivo (FR-028)
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+              example:
+                error:
+                  code: CANDIDATE_NOT_FOUND
+                  message: 'Candidato não encontrado. Ele pode não existir ou o link está incorreto.'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/resume-extractions:
+    post:
+      operationId: extractResumeFields
+      summary: Lê um currículo PDF e sugere Nome, E-mail e Telefone (FR-014 a FR-020)
+      description: |
+        O arquivo é processado só em memória e descartado ao final, com sucesso ou com falha
+        (FR-024). A resposta é uma sugestão: nada é gravado no banco.
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [file]
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: PDF de até 5.242.880 bytes (5 MB)
+      responses:
+        '200':
+          description: Texto lido; os campos podem ter sido identificados ou não
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ResumeExtractionResult' }
+              example:
+                fields: { fullName: 'João Pereira', email: 'joao.pereira@example.org', phone: '4133334444' }
+                identified: [fullName, email, phone]
+                notIdentified: []
+                pagesRead: 1
+        '400':
+          description: Nenhum arquivo enviado no campo `file`
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+              example:
+                error: { code: FILE_REQUIRED, message: 'Selecione um arquivo PDF para enviar.' }
+        '413':
+          description: |
+            Arquivo maior que 5 MB. Um 413 vindo do Nginx (acima de 6 MB) pode ter corpo HTML,
+            e o frontend DEVE tratar qualquer 413 como FILE_TOO_LARGE.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+              example:
+                error: { code: FILE_TOO_LARGE, message: 'O arquivo tem mais de 5 MB. Envie um PDF de até 5 MB.' }
+        '415':
+          description: O conteúdo não é PDF (verificado pela assinatura `%PDF-`, não pela extensão)
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+              example:
+                error: { code: INVALID_FILE_TYPE, message: 'Formato não aceito. Envie o currículo em PDF.' }
+        '422':
+          description: PDF válido, mas ilegível (FR-020)
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+              example:
+                error:
+                  code: PDF_UNREADABLE
+                  reason: encrypted
+                  message: 'Não foi possível ler o PDF porque ele está protegido por senha. Preencha os dados manualmente.'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+components:
+  responses:
+    InternalError:
+      description: Erro inesperado; os detalhes ficam só no log (FR-011)
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ErrorResponse' }
+          example:
+            error: { code: INTERNAL_ERROR, message: 'Não foi possível concluir a operação agora. Tente novamente em instantes.' }
+
+  schemas:
+    CandidateInput:
+      type: object
+      description: |
+        Regras completas e casos de teste em data-model.md (seção 2). O backend aplica trim em
+        todos os campos, converte opcionais vazios em null e normaliza o telefone para dígitos.
+      required: [fullName, email]
+      additionalProperties: false
+      properties:
+        fullName: { type: string, minLength: 1, maxLength: 250 }
+        email: { type: string, maxLength: 250, format: email }
+        phone:
+          type: [string, 'null']
+          description: Aceita `(`, `)`, espaço e `-`; depois de normalizar, 10 ou 11 dígitos
+          example: '(41) 99999-9999'
+        areaOfInterest: { type: [string, 'null'], maxLength: 250 }
+        professionalSummary: { type: [string, 'null'], maxLength: 1000 }
+
+    CandidateSummary:
+      type: object
+      required: [id, fullName, email, areaOfInterest, createdAt]
+      properties:
+        id: { type: integer }
+        fullName: { type: string }
+        email: { type: string }
+        areaOfInterest: { type: [string, 'null'] }
+        createdAt: { type: string, format: date-time, description: UTC em ISO-8601 }
+
+    Candidate:
+      allOf:
+        - $ref: '#/components/schemas/CandidateSummary'
+        - type: object
+          required: [phone, professionalSummary]
+          properties:
+            phone: { type: [string, 'null'], pattern: '^[0-9]{10,11}$' }
+            professionalSummary: { type: [string, 'null'] }
+
+    ResumeField:
+      type: string
+      enum: [fullName, email, phone]
+
+    ResumeExtractionResult:
+      type: object
+      required: [fields, identified, notIdentified, pagesRead]
+      properties:
+        fields:
+          type: object
+          required: [fullName, email, phone]
+          properties:
+            fullName: { type: [string, 'null'], maxLength: 250 }
+            email: { type: [string, 'null'], maxLength: 250 }
+            phone: { type: [string, 'null'], pattern: '^[0-9]{10,11}$' }
+        identified:
+          type: array
+          items: { $ref: '#/components/schemas/ResumeField' }
+        notIdentified:
+          type: array
+          items: { $ref: '#/components/schemas/ResumeField' }
+        pagesRead: { type: integer, minimum: 1, maximum: 5 }
+
+    FieldError:
+      type: object
+      required: [field, code, message]
+      properties:
+        field: { type: string, enum: [fullName, email, phone, areaOfInterest, professionalSummary] }
+        code: { type: string, enum: [REQUIRED, MAX_LENGTH, INVALID_EMAIL, INVALID_PHONE, EMAIL_ALREADY_EXISTS] }
+        message: { type: string }
+
+    ErrorResponse:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: object
+          required: [code, message]
+          properties:
+            code:
+              type: string
+              enum:
+                - VALIDATION_ERROR
+                - EMAIL_ALREADY_EXISTS
+                - CANDIDATE_NOT_FOUND
+                - FILE_REQUIRED
+                - FILE_TOO_LARGE
+                - INVALID_FILE_TYPE
+                - PDF_UNREADABLE
+                - DATABASE_UNAVAILABLE
+                - INTERNAL_ERROR
+            message: { type: string, description: Texto pt-BR, seguro para exibir }
+            reason:
+              type: string
+              enum: [encrypted, corrupted, no_text, timeout]
+              description: Presente só em PDF_UNREADABLE
+            fields:
+              type: array
+              items: { $ref: '#/components/schemas/FieldError' }
