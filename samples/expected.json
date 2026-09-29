@@ -1,0 +1,31 @@
+{
+  "$comment": "Resultado esperado de POST /api/resume-extractions para cada currículo de exemplo (dados fictícios). Usado pelos testes de integração do backend (SC-002).",
+  "success": {
+    "01-layout-simples.pdf": {
+      "fullName": "Conceição Aparecida da Silva",
+      "email": "conceicao.silva@example.com",
+      "phone": "41998765432"
+    },
+    "02-duas-colunas.pdf": {
+      "fullName": "João Pereira",
+      "email": "joao.pereira@example.org",
+      "phone": "4133334444"
+    },
+    "03-sem-telefone.pdf": {
+      "fullName": "Ana Beatriz Costa",
+      "email": "ana.costa@example.com",
+      "phone": null
+    },
+    "04-rotulo-nome.pdf": {
+      "fullName": "Pedro Henrique Alves",
+      "email": "pedro.alves@example.net",
+      "phone": "41912345678"
+    }
+  },
+  "failure": {
+    "05-digitalizado-sem-texto.pdf": { "status": 422, "code": "PDF_UNREADABLE", "reason": "no_text" },
+    "06-protegido-por-senha.pdf": { "status": 422, "code": "PDF_UNREADABLE", "reason": "encrypted" },
+    "07-corrompido.pdf": { "status": 422, "code": "PDF_UNREADABLE", "reason": "corrupted" },
+    "08-nao-e-pdf.pdf": { "status": 415, "code": "INVALID_FILE_TYPE" }
+  }
+}
