@@ -1,0 +1,19 @@
+.app-header {
+  display: flex;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--tui-border-normal);
+  background: var(--tui-background-base);
+}
+
+.app-header__brand {
+  font: var(--tui-typography-heading-h6);
+  color: var(--tui-text-primary);
+  text-decoration: none;
+}
+
+.app-main {
+  max-width: 64rem;
+  margin: 0 auto;
+  padding: 1.5rem 1rem 3rem;
+}

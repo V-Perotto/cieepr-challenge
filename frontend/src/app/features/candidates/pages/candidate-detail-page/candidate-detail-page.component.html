@@ -1,0 +1,29 @@
+<section class="page">
+  <header class="page__header">
+    <h1 class="page__title">Detalhes do candidato</h1>
+    <a tuiLink routerLink="/candidatos">Voltar para a lista</a>
+  </header>
+
+  @switch (store.detailStatus()) {
+    @case ('loaded') {
+      @if (store.selected(); as candidate) {
+        <app-candidate-details [candidate]="candidate" />
+      }
+    }
+    @case ('not-found') {
+      <tui-block-status>
+        <h2>Candidato não encontrado. Ele pode não existir ou o link está incorreto.</h2>
+        <a tuiButton routerLink="/candidatos">Voltar para a lista</a>
+      </tui-block-status>
+    }
+    @case ('error') {
+      <tui-block-status>
+        <h2>Não foi possível carregar o candidato. Tente novamente.</h2>
+        <button tuiButton type="button" appearance="secondary" (click)="store.loadById(+id())">Tentar de novo</button>
+      </tui-block-status>
+    }
+    @default {
+      <tui-loader class="page__loader" size="l" textContent="Carregando candidato..." />
+    }
+  }
+</section>

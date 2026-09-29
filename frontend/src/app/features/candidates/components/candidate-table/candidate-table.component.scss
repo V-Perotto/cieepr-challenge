@@ -1,0 +1,11 @@
+.candidate-table {
+  width: 100%;
+}
+
+.candidate-table__row {
+  cursor: pointer;
+
+  &:hover {
+    background: var(--tui-background-neutral-1);
+  }
+}

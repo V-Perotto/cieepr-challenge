@@ -1,0 +1,22 @@
+<div class="resume-upload">
+  <span class="resume-upload__label" id="resume-upload-label">Currículo em PDF (opcional)</span>
+  @if (selectedFile(); as file) {
+    <tui-files>
+      <tui-file [file]="file" (remove)="remove()" />
+    </tui-files>
+  } @else {
+    <label tuiInputFiles>
+      <input
+        tuiInputFiles
+        accept="application/pdf,.pdf"
+        aria-labelledby="resume-upload-label"
+        aria-describedby="resume-upload-hint"
+        [formControl]="control"
+        (reject)="onNativeReject($event)"
+      />
+    </label>
+  }
+  <small class="resume-upload__hint" id="resume-upload-hint"
+    >Envie um PDF de até 5 MB para preencher nome, e-mail e telefone automaticamente.</small
+  >
+</div>

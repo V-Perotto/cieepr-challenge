@@ -1,0 +1,12 @@
+.page__header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.page__title {
+  margin: 0;
+  font: var(--tui-typography-heading-h4);
+}

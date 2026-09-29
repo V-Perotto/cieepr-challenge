@@ -1,0 +1,15 @@
+.resume-upload {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.resume-upload__label {
+  font: var(--tui-typography-body-m);
+  font-weight: 600;
+}
+
+.resume-upload__hint {
+  font: var(--tui-typography-body-s);
+  color: var(--tui-text-secondary);
+}

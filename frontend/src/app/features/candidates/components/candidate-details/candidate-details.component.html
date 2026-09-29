@@ -1,0 +1,20 @@
+@let c = candidate();
+<dl class="details">
+  <dt>Nome completo</dt>
+  <dd>{{ c.fullName }}</dd>
+
+  <dt>E-mail</dt>
+  <dd>{{ c.email }}</dd>
+
+  <dt>Telefone</dt>
+  <dd>{{ c.phone ? (c.phone | phoneFormat) : 'Não informado' }}</dd>
+
+  <dt>Área ou cargo de interesse</dt>
+  <dd>{{ c.areaOfInterest ?? 'Não informado' }}</dd>
+
+  <dt>Resumo profissional</dt>
+  <dd class="details__summary">{{ c.professionalSummary ?? 'Não informado' }}</dd>
+
+  <dt>Cadastrado em</dt>
+  <dd>{{ c.createdAt | date: 'dd/MM/yyyy HH:mm' }}</dd>
+</dl>

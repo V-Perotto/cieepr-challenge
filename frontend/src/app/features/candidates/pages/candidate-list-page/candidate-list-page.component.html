@@ -1,0 +1,28 @@
+<section class="page">
+  <header class="page__header">
+    <h1 class="page__title">Candidatos</h1>
+    <a tuiButton size="m" routerLink="/candidatos/novo">Novo candidato</a>
+  </header>
+
+  @switch (store.listStatus()) {
+    @case ('error') {
+      <tui-block-status>
+        <h2>Não foi possível carregar os candidatos. Tente novamente.</h2>
+        <button tuiButton type="button" appearance="secondary" (click)="store.loadList()">Tentar de novo</button>
+      </tui-block-status>
+    }
+    @case ('loaded') {
+      @if (store.isEmpty()) {
+        <tui-block-status>
+          <h2>Nenhum candidato cadastrado ainda.</h2>
+          <a tuiButton routerLink="/candidatos/novo">Cadastrar o primeiro candidato</a>
+        </tui-block-status>
+      } @else {
+        <app-candidate-table [items]="store.items()" />
+      }
+    }
+    @default {
+      <tui-loader class="page__loader" size="l" textContent="Carregando candidatos..." />
+    }
+  }
+</section>

@@ -1,0 +1,11 @@
+node_modules
+dist
+.angular
+coverage
+*.log
+.env
+.env.*
+.git
+.vscode
+Dockerfile
+.dockerignore
