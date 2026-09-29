@@ -189,10 +189,8 @@ próprio backend os executa **na inicialização do container**, antes de aceita
 - O manifesto da tag `2025-latest` é **só amd64**. Em hosts ARM (Apple Silicon) é preciso ativar
   a emulação x86 (Rosetta) no Docker Desktop. Isso vai no README, como pré-requisito.
 - O caminho do `sqlcmd` nas imagens 2022+ é `/opt/mssql-tools18/bin/sqlcmd` (o `-C` aceita o
-  certificado autoassinado). O histórico da imagem 2025 não mostra se ele continua incluído.
-  Por isso, o healthcheck tenta primeiro `/opt/mssql-tools18` e depois `/opt/mssql-tools`, e
-  isso **precisa ser confirmado no primeiro `docker compose up`** (ver
-  [quickstart.md](./quickstart.md), passo 2).
+  certificado autoassinado). **Confirmado na implementação** (2026-09-29): a imagem
+  `2025-latest` traz o `sqlcmd` 18.6 nesse caminho. O healthcheck usa só esse caminho.
 - `MSSQL_SA_PASSWORD` precisa atender à política do SQL Server (8+ caracteres e 3 dos 4 tipos:
   maiúscula, minúscula, dígito, símbolo). O valor padrão do `.env.example` atende. Se a senha
   não atender, o container termina e o healthcheck nunca passa, e isso vai no troubleshooting

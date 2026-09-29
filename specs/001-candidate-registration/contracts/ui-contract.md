@@ -86,3 +86,4 @@ erros sem corpo JSON (ex.: um 413 do Nginx).
 | Lista vazia                            | Nenhum candidato cadastrado ainda. (botão "Cadastrar o primeiro candidato")        |
 | Falha ao carregar a lista              | Não foi possível carregar os candidatos. Tente novamente. (botão "Tentar de novo") |
 | Candidato não encontrado (404)         | Candidato não encontrado. Ele pode não existir ou o link está incorreto. (botão "Voltar para a lista") |
+| Falha ao carregar os detalhes          | Não foi possível carregar o candidato. Tente novamente. (botão "Tentar de novo") |
