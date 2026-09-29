@@ -3,6 +3,11 @@
 ## Node
 node_modules/
 
+## Environment
+.env
+.env.*
+!.env.example
+
 ## AI 
 .claude/
 .specify/credentials.json
