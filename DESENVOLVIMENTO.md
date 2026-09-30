@@ -155,6 +155,14 @@ implementação:
 | No frontend, `pnpm test` travava num terminal interativo: o Angular CLI perguntava sobre telemetria e depois entrava em modo watch | `"cli": { "analytics": false }` no `angular.json`, e `test` passou a ser execução única (`test:watch` para o modo contínuo) |
 | O SC-008 (desempenho da listagem) não tinha um roteiro de verificação | Novo passo 4.1 no quickstart, executado exatamente como está escrito |
 
+**Correções vindas da revisão manual do autor:**
+
+| Problema encontrado | Correção |
+|---------------------|----------|
+| O campo "Resumo profissional" não crescia com o texto: a Taiga 5 limita o `tuiTextarea` a 3 linhas por padrão e o resto rolava dentro de uma caixa pequena | `[min]="4"` e `[max]="40"` linhas: o campo cresce com o conteúdo e cabe os 1000 caracteres mesmo num celular |
+| O resumo aceitava mais de 1000 caracteres: o `[limit]` da Taiga só mostra o contador e marca o erro | `maxlength` nativo: a digitação para em 1000 e a colagem é cortada. Medido no navegador: 995 + 20 digitados → 1000; 1500 colados → 1000 |
+| Na largura de celular (375 px), a tabela da listagem (~620 px) fazia a página inteira rolar na horizontal | A tabela fica numa região com rolagem horizontal própria (focável pelo teclado); a página mantém a largura da tela |
+
 **Falsos alarmes investigados e descartados**: duas falhas do roteiro E2E (erros que
 "não apareciam" e mensagens antigas depois do PDF) eram só o roteiro lendo a tela antes do
 ciclo de renderização zoneless. O estado dos controles já estava correto no mesmo instante.

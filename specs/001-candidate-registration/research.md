@@ -239,21 +239,22 @@ futura se as regras crescerem.
 **Decision**:
 - Angular 22.2.0 com componentes standalone, zoneless (padrão das versões atuais), Reactive
   Forms tipados e sinais (`signal`, `computed`) para o estado.
-- Taiga UI 5.26.0 (`@taiga-ui/core`, `kit`, `cdk`, `icons`, `i18n`), instalado com
-  `ng add taiga-ui`. A compatibilidade foi conferida: o peer `@angular/core` é `>=19.0.0`, e o
-  Taiga exige `@angular/cdk` 22 e `@maskito/*` ^5.5 como peers.
+- Taiga UI 5.26.0 (`@taiga-ui/core`, `kit`, `cdk`, `icons`, `i18n`, `styles`, mais
+  `addon-table` e `layout`), instalado com `ng add taiga-ui`. A compatibilidade foi conferida:
+  o peer `@angular/core` é `>=19.0.0`, e o Taiga exige `@angular/cdk` 22 e `@maskito/*` ^5.5
+  como peers. O tema usa `.less`, então o frontend também depende do `less`.
 - Mapeamento dos componentes:
 
 | Necessidade                         | Componente                                                   |
 |-------------------------------------|--------------------------------------------------------------|
-| Campos de texto e contador          | `tuiTextfield` + `tuiInput`, `tuiTextarea` (com limite)      |
+| Campos de texto e contador          | `<tui-textfield>` + `input[tuiInput]` / `textarea[tuiTextarea]` (`[limit]`, `[min]`/`[max]` linhas) |
 | Máscara de telefone                 | Maskito (`@maskito/angular`), máscara `(00) 00000-0000`      |
-| Upload do PDF                       | `tui-input-files` (`accept="application/pdf"`, 5 MB)         |
+| Upload do PDF                       | `label[tuiInputFiles]` + `<tui-files>`/`<tui-file>` (`@taiga-ui/kit`) |
 | Estado "processando"                | `tui-loader`                                                 |
-| Campos preenchidos pelo PDF         | `tuiBadge` / hint no campo                                   |
-| Confirmação e erros gerais          | `TuiAlertService` (notificações)                             |
-| Listagem                            | `tuiTable`                                                   |
-| Lista vazia / não encontrado        | `tui-block-status`                                           |
+| Campos preenchidos pelo PDF         | `tuiBadge` junto ao campo                                    |
+| Confirmação e erros gerais          | `TuiNotificationService` (notificações; não existe `TuiAlertService` na v5) |
+| Listagem                            | `table[tuiTable]` (`@taiga-ui/addon-table`)                  |
+| Lista vazia / não encontrado        | `tui-block-status` (`@taiga-ui/layout`)                      |
 
 - Locale `pt-BR` (`registerLocaleData(localePt)`, `LOCALE_ID`) para datas, e idioma português
   do `@taiga-ui/i18n` nas mensagens internas dos componentes.

@@ -464,14 +464,14 @@ SELECT * FROM dbo.Candidates`). Corresponde ao passo 3 do [quickstart](./quickst
     `professionalSummary`.
   - Controles Taiga conforme a tabela "Formulário de cadastro" de **UI**: Maskito no
     telefone, alternando `(00) 0000-0000` e `(00) 00000-0000`; `tuiTextarea` com contador
-    `n/1000`.
+    `n/1000`, `maxlength` nativo de 1000 e crescimento de 4 a 40 linhas (`[min]`/`[max]`).
   - Erros exibidos com `validation-messages.ts` quando o campo é tocado.
   - Sinal `saving`, com o botão Salvar desabilitado só enquanto `saving()` for verdadeiro.
   - Ao salvar: `markAllAsTouched`; se inválido, para. Senão, monta o `CandidateInput` (trim,
     opcionais vazios → `null`, `normalizePhone`) e chama `create` com proteção contra envio
     duplo (`exhaustMap` ou guarda por `saving`).
   - Respostas:
-    - 201: `TuiAlertService` com "Candidato cadastrado com sucesso!" e `form.reset()`.
+    - 201: `TuiNotificationService` com "Candidato cadastrado com sucesso!" e `form.reset()`.
     - 400: aplica os `fields` aos controles (`setErrors({ server: message })`).
     - 409: aplica o erro ao controle `email`.
     - Outros: alerta "Não foi possível salvar agora. Seus dados continuam no formulário;
@@ -757,7 +757,8 @@ bloqueado.
   /api/resume-extractions`, `FormData` com o campo `file`).
 - [X] T081 [P] [US3] Criar
   `frontend/src/app/features/candidates/components/resume-upload/` com:
-  - `tui-input-files` com `accept="application/pdf,.pdf"` e um arquivo por vez.
+  - `label[tuiInputFiles]` com `accept="application/pdf,.pdf"` e um arquivo por vez; o arquivo
+    escolhido aparece em `<tui-files>`/`<tui-file>`.
   - Checagens no navegador: tipo `application/pdf` ou extensão `.pdf`, e tamanho ≤ 5.242.880
     bytes, com as mensagens de **UI**.
   - Saídas `fileSelected(File)` e `fileRemoved()`.
@@ -813,7 +814,8 @@ cadastro e nunca o bloqueia.
 - [X] T086 [P] Revisão de acessibilidade nos componentes de `frontend/src/app/features/
   candidates/`:
   - Todo campo tem rótulo associado.
-  - Erros associados ao campo (`aria-describedby` da Taiga).
+  - Erros associados ao campo por `aria-errormessage` + `aria-invalid` (a Taiga sobrescreve o
+    `aria-describedby`).
   - Status da extração com `aria-live`.
   - Linhas da tabela acessíveis por Tab e Enter.
 - [X] T087 [P] Revisão de segurança:

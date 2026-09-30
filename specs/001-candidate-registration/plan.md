@@ -43,11 +43,14 @@ Runtime Node.js 26.10.0 (`node:26.10-bookworm-slim`).
 - **Backend**: Express 5.2.1, multer 2.4.0 (upload em memória), zod 4.6.5 (validação), mssql
   12.7.2 (driver), unpdf 1.8.1 (texto do PDF) e pino 10 (logs).
 - **Frontend**: Angular 22.2.0 (standalone, zoneless, Reactive Forms tipados, sinais), Taiga UI
-  5.26.0 (`core`, `kit`, `cdk`, `icons`, `i18n`) e Maskito 5 (máscara de telefone).
+  5.26.0 (`core`, `kit`, `cdk`, `icons`, `i18n`, `styles`, `addon-table`, `layout`), Maskito 5
+  (máscara de telefone) e `less` (compilação do tema da Taiga).
 - **Raiz**: semantic-release 25.0.9 e plugins (`commit-analyzer` 13.0.1,
   `release-notes-generator` 14.1.1, `changelog` 7.0.0, `npm` 13.2.0, `github` 12.0.10,
-  `git` 11.0.1), `conventional-changelog-conventionalcommits` 10.4.0, commitlint 21.2.3 e
-  husky 9.1.7.
+  `git` 11.0.1), `conventional-changelog-conventionalcommits` 10.4.0, commitlint 21.2.3,
+  husky 9.1.7 e pdfkit 0.20 (gerador dos PDFs de exemplo).
+- **pnpm 11**: cada app tem um `pnpm-workspace.yaml` com `allowBuilds`, que libera os scripts
+  de build de `esbuild`, `lmdb`, `@parcel/watcher` e `msgpackr-extract` (bloqueados por padrão).
 
 **Storage**: SQL Server 2025 (`mcr.microsoft.com/mssql/server:2025-latest`, amd64). Uma tabela,
 `dbo.Candidates`, e a tabela de controle `dbo.SchemaMigrations`, no volume nomeado
@@ -139,9 +142,11 @@ specs/001-candidate-registration/
 ├── CHANGELOG.md                  # gerado pelo release
 ├── samples/
 │   ├── README.md                 # manifesto: resultado esperado por arquivo
+│   ├── expected.json             # o mesmo manifesto, lido pelos testes de integração (SC-002)
+│   ├── generate-samples.mjs      # gerador determinístico (pnpm samples:generate, pdfkit)
 │   └── 01-…08-*.pdf              # currículos fictícios (research R16)
 ├── backend/
-│   ├── Dockerfile                # multi-stage: deps → build (tsc) → runtime (usuário node)
+│   ├── Dockerfile                # multi-stage: deps → build (tsc) → test → runtime (usuário node)
 │   ├── .dockerignore
 │   ├── package.json · pnpm-lock.yaml · tsconfig.json · tsconfig.build.json · vitest.config.ts
 │   ├── db/migrations/
@@ -150,6 +155,7 @@ specs/001-candidate-registration/
 │   │   ├── server.ts             # bootstrap: config → migrations → listen
 │   │   ├── app.ts                # createApp(deps): monta rotas e middlewares (injeção manual)
 │   │   ├── config/env.ts         # variáveis de ambiente validadas com zod
+│   │   ├── logger.ts             # pino: JSON no stdout, sem dados pessoais
 │   │   ├── controllers/
 │   │   │   ├── candidates.controller.ts
 │   │   │   ├── resume-extractions.controller.ts
@@ -180,11 +186,12 @@ specs/001-candidate-registration/
 │       ├── http/                 # supertest com fakes (status e formato de erro do contrato)
 │       └── fixtures/             # textos de currículo para o parser
 └── frontend/
-    ├── Dockerfile                # multi-stage: node:26.10-bookworm-slim (pnpm build) → nginx:1.30-alpine
+    ├── Dockerfile                # multi-stage: deps → build (pnpm build) → test → nginx:1.30-alpine
     ├── nginx.conf                # SPA fallback, proxy /api → backend:3000, client_max_body_size 6m
     ├── .dockerignore
     ├── proxy.conf.json           # ng serve: /api → localhost:3000
     ├── package.json · pnpm-lock.yaml · angular.json · tsconfig*.json
+    ├── src/test-providers.ts · src/test-setup.ts  # providers da Taiga e polyfills do jsdom (testes)
     └── src/app/
         ├── app.config.ts · app.routes.ts · app.ts
         ├── core/
@@ -196,16 +203,21 @@ specs/001-candidate-registration/
         │   ├── data/candidates.store.ts      # sinais: lista, detalhe, loading, erro
         │   ├── validation/candidate-validators.ts
         │   ├── validation/validation-messages.ts
+        │   ├── validation/phone-mask.ts      # máscara Maskito (10/11 dígitos)
+        │   ├── validation/pdf-file.ts        # checagem de tipo/tamanho no navegador
+        │   ├── validation/resume-messages.ts # mensagens do PDF (ui-contract)
         │   ├── pages/
         │   │   ├── candidate-list-page/
         │   │   ├── candidate-create-page/
         │   │   └── candidate-detail-page/
         │   └── components/
         │       ├── candidate-form/           # formulário + estado da extração (data-model, seção 4)
-        │       ├── resume-upload/            # tui-input-files + checagens no navegador
+        │       ├── resume-upload/            # label[tuiInputFiles] + checagens no navegador
         │       ├── candidate-table/
         │       └── candidate-details/
-        └── shared/pipes/phone-format.pipe.ts
+        └── shared/
+            ├── pipes/phone-format.pipe.ts
+            └── utils/phone.ts                # formatPhone, usado pelo pipe e pelo formulário
 ```
 
 **Structure Decision**: aplicação web com `backend/` e `frontend/` independentes. Cada pasta

@@ -4,7 +4,7 @@
 
 **Created**: 2026-09-29
 
-**Status**: Draft
+**Status**: Implemented
 
 **Input**: Descrição do usuário:
 
@@ -173,8 +173,8 @@ corrompido) e conferir as mensagens e que o cadastro manual continua funcionando
 - **Números que não são telefone no currículo** (ex.: CEP com 8 dígitos, ou número sem DDD):
   não são usados como telefone, porque não têm 10 ou 11 dígitos. O campo fica como "não
   identificado".
-- **Valor extraído que viola uma regra** (ex.: nome com mais de 250 caracteres ou e-mail
-  malformado): o campo não é preenchido e é tratado como "não identificado".
+- **Valor extraído que viola uma regra** (ex.: nome com mais de 250 caracteres): tratado como
+  "não identificado" (FR-019).
 - **Segundo PDF anexado**: o novo arquivo é processado e preenche apenas os campos que estiverem
   vazios naquele momento.
 - **PDF removido depois da extração**: os valores já preenchidos continuam no formulário e o
