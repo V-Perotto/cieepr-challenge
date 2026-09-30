@@ -39,6 +39,8 @@ export const ERROR_MESSAGES = {
   INTERNAL_ERROR: 'Não foi possível concluir a operação agora. Tente novamente em instantes.',
 } as const satisfies Record<Exclude<ErrorCode, 'PDF_UNREADABLE'>, string>;
 
+export const INVALID_PAGINATION_MESSAGE = 'Parâmetros de paginação inválidos.';
+
 export const PDF_UNREADABLE_MESSAGES = {
   encrypted:
     'Não foi possível ler o PDF porque ele está protegido por senha. Preencha os dados manualmente.',
@@ -66,6 +68,13 @@ export class AppError extends Error {
 export class ValidationError extends AppError {
   constructor(fields: FieldError[]) {
     super('VALIDATION_ERROR', 400, ERROR_MESSAGES.VALIDATION_ERROR, fields);
+  }
+}
+
+/** `page`/`pageSize` fora do formato ou dos limites da listagem (400, sem erros por campo). */
+export class InvalidPaginationError extends AppError {
+  constructor() {
+    super('VALIDATION_ERROR', 400, INVALID_PAGINATION_MESSAGE);
   }
 }
 

@@ -16,10 +16,12 @@ export class FakeCandidateRepository implements CandidateRepository {
     return created;
   }
 
-  async list(): Promise<CandidateSummary[]> {
-    return [...this.items]
+  async list({ offset, limit }: { offset: number; limit: number }): Promise<{ items: CandidateSummary[]; total: number }> {
+    const items = [...this.items]
       .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime() || b.id - a.id)
+      .slice(offset, offset + limit)
       .map(({ id, fullName, email, areaOfInterest, createdAt }) => ({ id, fullName, email, areaOfInterest, createdAt }));
+    return { items, total: this.items.length };
   }
 
   async findById(id: number): Promise<Candidate | null> {

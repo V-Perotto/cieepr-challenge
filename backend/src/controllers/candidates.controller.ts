@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { toCandidateDto, toCandidateSummaryDto } from '../domain/candidate.js';
+import { toCandidateDto, toCandidatePageDto } from '../domain/candidate.js';
 import type { CandidateService } from '../services/candidate.service.js';
 
 /** /api/candidates: só tradução HTTP ⇄ service (constituição, Princípio V). */
@@ -11,9 +11,9 @@ export function createCandidatesRouter(service: CandidateService): Router {
     res.status(201).location(`/api/candidates/${candidate.id}`).json(toCandidateDto(candidate));
   });
 
-  router.get('/', async (_req, res) => {
-    const candidates = await service.list();
-    res.json(candidates.map(toCandidateSummaryDto));
+  router.get('/', async (req, res) => {
+    const page = await service.list({ page: req.query['page'], pageSize: req.query['pageSize'] });
+    res.json(toCandidatePageDto(page));
   });
 
   router.get('/:id', async (req, res) => {

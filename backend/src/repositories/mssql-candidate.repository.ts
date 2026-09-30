@@ -58,18 +58,32 @@ export class MssqlCandidateRepository implements CandidateRepository {
     }
   }
 
-  async list(): Promise<CandidateSummary[]> {
-    const result = await this.pool.request().query<Omit<CandidateRow, 'Phone' | 'ProfessionalSummary'>>(`
-      SELECT Id, FullName, Email, AreaOfInterest, CreatedAt
-      FROM dbo.Candidates
-      ORDER BY CreatedAt DESC, Id DESC`);
-    return result.recordset.map((row) => ({
-      id: row.Id,
-      fullName: row.FullName,
-      email: row.Email,
-      areaOfInterest: row.AreaOfInterest,
-      createdAt: row.CreatedAt,
-    }));
+  async list({ offset, limit }: { offset: number; limit: number }): Promise<{ items: CandidateSummary[]; total: number }> {
+    // Um lote com dois resultados: o total e a página (OFFSET/FETCH usa o IX_Candidates_CreatedAt).
+    const result = await this.pool
+      .request()
+      .input('offset', sql.Int, offset)
+      .input('limit', sql.Int, limit)
+      .query(`
+        SELECT COUNT(*) AS Total FROM dbo.Candidates;
+        SELECT Id, FullName, Email, AreaOfInterest, CreatedAt
+        FROM dbo.Candidates
+        ORDER BY CreatedAt DESC, Id DESC
+        OFFSET @offset ROWS FETCH NEXT @limit ROWS ONLY;`);
+    const [totals, rows] = result.recordsets as unknown as [
+      { Total: number }[],
+      Omit<CandidateRow, 'Phone' | 'ProfessionalSummary'>[],
+    ];
+    return {
+      total: totals[0]?.Total ?? 0,
+      items: rows.map((row) => ({
+        id: row.Id,
+        fullName: row.FullName,
+        email: row.Email,
+        areaOfInterest: row.AreaOfInterest,
+        createdAt: row.CreatedAt,
+      })),
+    };
   }
 
   async findById(id: number): Promise<Candidate | null> {

@@ -43,6 +43,18 @@ export interface CandidateDto extends CandidateSummaryDto {
   professionalSummary: string | null;
 }
 
+/** Página da listagem (FR-025). */
+export interface CandidatePage {
+  items: CandidateSummary[];
+  page: number;
+  pageSize: number;
+  total: number;
+}
+
+export interface CandidatePageDto extends Omit<CandidatePage, 'items'> {
+  items: CandidateSummaryDto[];
+}
+
 export interface ResumeExtractionResult {
   fields: Record<ResumeField, string | null>;
   identified: ResumeField[];
@@ -58,6 +70,10 @@ export function toCandidateSummaryDto(c: CandidateSummary): CandidateSummaryDto 
     areaOfInterest: c.areaOfInterest,
     createdAt: c.createdAt.toISOString(),
   };
+}
+
+export function toCandidatePageDto(page: CandidatePage): CandidatePageDto {
+  return { ...page, items: page.items.map(toCandidateSummaryDto) };
 }
 
 export function toCandidateDto(c: Candidate): CandidateDto {

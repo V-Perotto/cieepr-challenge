@@ -4,7 +4,7 @@ import type { Candidate, CandidateSummary, NewCandidate } from '../domain/candid
 export interface CandidateRepository {
   /** @throws EmailAlreadyExistsError quando o e-mail já existe (sem diferenciar maiúsculas). */
   create(candidate: NewCandidate): Promise<Candidate>;
-  /** Do mais recente para o mais antigo. */
-  list(): Promise<CandidateSummary[]>;
+  /** Uma fatia da listagem, do mais recente para o mais antigo, e o total de candidatos. */
+  list(slice: { offset: number; limit: number }): Promise<{ items: CandidateSummary[]; total: number }>;
   findById(id: number): Promise<Candidate | null>;
 }

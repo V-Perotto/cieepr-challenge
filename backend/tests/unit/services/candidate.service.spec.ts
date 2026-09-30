@@ -1,5 +1,10 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { CandidateNotFoundError, EmailAlreadyExistsError, ValidationError } from '../../../src/domain/errors.js';
+import {
+  CandidateNotFoundError,
+  EmailAlreadyExistsError,
+  InvalidPaginationError,
+  ValidationError,
+} from '../../../src/domain/errors.js';
 import { CandidateService } from '../../../src/services/candidate.service.js';
 import { FakeCandidateRepository } from '../../fakes/fake-candidate.repository.js';
 
@@ -54,16 +59,56 @@ describe('CandidateService', () => {
   });
 
   describe('list', () => {
-    it('devolve os candidatos na ordem do repositório (mais recente primeiro)', async () => {
-      await service.create({ fullName: 'Primeira', email: 'a@example.com' });
-      await service.create({ fullName: 'Segunda', email: 'b@example.com' });
+    async function seed(count: number) {
+      for (let i = 1; i <= count; i++) await service.create({ fullName: `Candidato ${i}`, email: `c${i}@example.com` });
+    }
 
-      const items = await service.list();
-      expect(items.map((c) => c.fullName)).toEqual(['Segunda', 'Primeira']);
+    it('usa por padrão a página 1 com 10 itens, do mais recente para o mais antigo', async () => {
+      await seed(12);
+      const spy = vi.spyOn(repository, 'list');
+
+      const result = await service.list({});
+
+      expect(spy).toHaveBeenCalledWith({ offset: 0, limit: 10 });
+      expect(result.page).toBe(1);
+      expect(result.pageSize).toBe(10);
+      expect(result.total).toBe(12);
+      expect(result.items).toHaveLength(10);
+      expect(result.items[0]?.fullName).toBe('Candidato 12');
+    });
+
+    it('calcula o deslocamento a partir de page e pageSize (vindos da URL como texto)', async () => {
+      await seed(12);
+      const spy = vi.spyOn(repository, 'list');
+
+      const result = await service.list({ page: '3', pageSize: '5' });
+
+      expect(spy).toHaveBeenCalledWith({ offset: 10, limit: 5 });
+      expect(result.items.map((c) => c.fullName)).toEqual(['Candidato 2', 'Candidato 1']);
+    });
+
+    it('página além da última devolve items vazio e o total', async () => {
+      await seed(3);
+      expect(await service.list({ page: '9' })).toEqual({ items: [], page: 9, pageSize: 10, total: 3 });
     });
 
     it('devolve lista vazia quando não há cadastros', async () => {
-      expect(await service.list()).toEqual([]);
+      expect(await service.list({})).toEqual({ items: [], page: 1, pageSize: 10, total: 0 });
+    });
+
+    it.each([
+      { page: '0' },
+      { page: '-1' },
+      { page: 'abc' },
+      { page: '1.5' },
+      { page: ['1', '2'] },
+      { pageSize: '0' },
+      { pageSize: '51' },
+      { pageSize: 'dez' },
+    ])('parâmetros inválidos %j → InvalidPaginationError, sem consultar o repositório', async (query) => {
+      const spy = vi.spyOn(repository, 'list');
+      await expect(service.list(query)).rejects.toBeInstanceOf(InvalidPaginationError);
+      expect(spy).not.toHaveBeenCalled();
     });
   });
 
