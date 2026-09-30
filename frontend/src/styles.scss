@@ -1,7 +1,55 @@
 /* Estilos globais; o tema e as fontes da Taiga UI vêm do angular.json. */
+
+/*
+ * Paleta CIEE sobre os tokens da Taiga UI 5. Os nomes pedidos seguiam a nomenclatura antiga
+ * (v2/v3); a correspondência com os tokens atuais é:
+ *
+ *   --tui-primary / -hover / -active   → --tui-background-accent-1 / -hover / -pressed
+ *   --tui-primary-text                 → --tui-text-primary-on-accent-1
+ *   --tui-secondary / -hover / -active → --tui-background-accent-2 / -hover / -pressed
+ *   --tui-secondary-text               → --tui-text-primary-on-accent-2
+ *   --tui-text-01 / --tui-text-02      → --tui-text-primary / --tui-text-secondary
+ *   --tui-link / --tui-link-hover      → --tui-text-action / --tui-text-action-hover
+ *   --tui-text-positive/-negative, --tui-background-base, --tui-background-elevation-1/-2:
+ *   mesmos nomes.
+ *
+ * A Taiga declara os tokens em `:root, :host, [tuiTheme]`; o seletor abaixo cobre os dois
+ * lugares no tema claro sem afetar um eventual tema escuro.
+ */
+:root,
+[tuiTheme]:not([tuiTheme='dark']) {
+  /* Marca e ações primárias */
+  --tui-background-accent-1: #00458c;
+  --tui-background-accent-1-hover: #002d5e;
+  --tui-background-accent-1-pressed: #001f42;
+  --tui-text-primary-on-accent-1: #ffffff;
+
+  /* Secundária / destaque (laranja CIEE) */
+  --tui-background-accent-2: #e86c00;
+  --tui-background-accent-2-hover: #c75c00;
+  --tui-background-accent-2-pressed: #a64d00;
+  --tui-text-primary-on-accent-2: #ffffff;
+
+  /* Textos */
+  --tui-text-primary: #2b2b2b;
+  --tui-text-secondary: #555555;
+  --tui-text-positive: #107c41;
+  --tui-text-negative: #d13438;
+
+  /* Superfícies e fundos */
+  --tui-background-base: #ffffff;
+  --tui-background-elevation-1: #f4f7fa;
+  --tui-background-elevation-2: #e9eef3;
+
+  /* Links */
+  --tui-text-action: #00458c;
+  --tui-text-action-hover: #e86c00;
+}
+
 html,
 body {
   margin: 0;
   min-height: 100%;
-  background: var(--tui-background-base-alt);
+  // Fundo da página no tom azulado da paleta (#f4f7fa); cartões e tabela ficam em branco.
+  background: var(--tui-background-elevation-1);
 }
