@@ -18,6 +18,13 @@ FROM base AS prod-deps
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 RUN pnpm install --frozen-lockfile --prod
 
+# Testes (unitários, HTTP e de integração). Os PDFs de samples/ ficam fora do contexto de build:
+#   docker build --target test -t cieepr-backend-test ./backend
+#   docker run --rm -v "$PWD/samples:/samples:ro" cieepr-backend-test
+FROM deps AS test
+COPY . .
+CMD ["pnpm", "test"]
+
 FROM node:26.10-bookworm-slim AS runtime
 ENV NODE_ENV=production
 WORKDIR /app
