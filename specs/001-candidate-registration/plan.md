@@ -47,7 +47,7 @@ Runtime Node.js 26.10.0 (`node:26.10-bookworm-slim`).
   (máscara de telefone) e `less` (compilação do tema da Taiga).
 - **Raiz**: semantic-release 25.0.9 e plugins (`commit-analyzer` 13.0.1,
   `release-notes-generator` 14.1.1, `changelog` 7.0.0, `npm` 13.2.0, `github` 12.0.10,
-  `git` 11.0.1), `conventional-changelog-conventionalcommits` 10.4.0, commitlint 21.2.3,
+  `git` 11.0.1), `conventional-changelog-conventionalcommits` 9.3.1, commitlint 21.2.3,
   husky 9.1.7 e pdfkit 0.20 (gerador dos PDFs de exemplo).
 - **pnpm 11**: cada app tem um `pnpm-workspace.yaml` com `allowBuilds`, que libera os scripts
   de build de `esbuild`, `lmdb`, `@parcel/watcher` e `msgpackr-extract` (bloqueados por padrão).

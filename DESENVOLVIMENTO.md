@@ -218,6 +218,7 @@ das ferramentas:
 | Teste do error handler manipulava a pilha interna do Express | Trocado por um app Express mínimo com o `createErrorHandler` |
 | Healthcheck do SQL Server com dois caminhos possíveis do `sqlcmd` | O caminho `/opt/mssql-tools18/bin/sqlcmd` foi confirmado na imagem 2025, e o healthcheck foi simplificado |
 | Instrução do README para rodar o frontend sozinho (`docker network connect --alias`) falharia com o container já conectado | Uso de `--network-alias backend` no `docker run` do backend. Os dois roteiros foram executados e validados |
+| O primeiro release no `main` falhou com `Missing helper`: o `conventional-changelog-conventionalcommits` 10 exige o `conventional-changelog-writer` 9, mas o `release-notes-generator` 14.1.1 (a versão mais recente) ainda usa o 8 | Preset fixado em `^9.3.1`. As notas da versão foram geradas localmente com a config do `package.json` antes de um novo merge |
 
 **Correções vindas do `/speckit-analyze`**, a análise de consistência feita depois da
 implementação:

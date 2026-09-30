@@ -346,8 +346,10 @@ repositório.
   `@semantic-release/commit-analyzer` 13.0.1, `release-notes-generator` 14.1.1, `changelog`
   7.0.0, `npm` 13.2.0, `github` 12.0.10 e `git` 11.0.1.
 - Dependências acrescentadas:
-  - **`conventional-changelog-conventionalcommits` 10.4.0**, obrigatória para o
+  - **`conventional-changelog-conventionalcommits` 9.3.1**, obrigatória para o
     `preset: "conventionalcommits"`. Sem ela, o semantic-release falha com "Cannot find module".
+    A versão 10 exige o `conventional-changelog-writer` 9, e o `release-notes-generator` 14.1.1
+    ainda usa o 8 (erro `Missing helper` no release); por isso a faixa `^9.3.1`.
   - `@commitlint/cli` e `@commitlint/config-conventional` 21.2.3 e `husky` 9.1.7, para validar
     as mensagens de commit (constituição, Princípio III, DEVERIA).
 - Scripts:
