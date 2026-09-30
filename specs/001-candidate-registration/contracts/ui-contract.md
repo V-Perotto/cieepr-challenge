@@ -10,7 +10,7 @@ componente e o [quickstart](../quickstart.md) conferem os textos deste arquivo.
 | Rota                | Tela                  | Conteúdo mínimo                                                                 |
 |---------------------|-----------------------|---------------------------------------------------------------------------------|
 | `/`                 | -                     | Redireciona para `/candidatos`                                                  |
-| `/candidatos`       | Listagem              | Tabela (Nome, E-mail, Área ou cargo de interesse, Cadastrado em), do mais recente ao mais antigo; botão "Novo candidato"; cada linha abre os detalhes (SC-007: 1 clique) |
+| `/candidatos`       | Listagem              | Tabela (Nome, E-mail, Área ou cargo de interesse, Cadastrado em), do mais recente ao mais antigo, **10 por página** por padrão; rodapé no padrão "Footer" da tabela da Taiga (`caption[tuiCaption]`): total ("N candidatos"), botão `tuiButtonSelect` "Exibindo X–Y" com `tui-data-list-wrapper` ("10 por página", "20 por página", "50 por página") e `tui-pagination`; página e tamanho em `?pagina=N&itens=M` (os padrões, página 1 e 10 itens, não aparecem na URL); botão "Novo candidato"; cada linha abre os detalhes (SC-007: 1 clique) |
 | `/candidatos/novo`  | Cadastro              | Upload opcional de PDF no topo; os 5 campos; botão "Salvar"                     |
 | `/candidatos/:id`   | Detalhes              | Todos os campos e "Cadastrado em" (data e hora); botão "Voltar para a lista"    |
 | `**`                | -                     | Redireciona para `/candidatos`                                                  |
@@ -45,6 +45,11 @@ Comportamento:
   status da leitura do PDF usa `aria-live="polite"`.
 - Telas estreitas: a página nunca rola na horizontal. Na listagem, só a tabela rola, dentro de
   uma região focável ("Lista de candidatos").
+- Textos longos na tabela (nome, e-mail, área), inclusive sem espaços, quebram dentro da célula
+  (`overflow-wrap: anywhere`); a data não quebra.
+- Paginação: `?pagina=` inválido (ex.: `abc`, `0`) abre a página 1; `?itens=` fora de 10, 20 ou
+  50 usa 10; uma página além da última leva à última página. Ao trocar o tamanho, a nova página é
+  a que contém o primeiro item que estava sendo exibido.
 
 ## Mensagens
 

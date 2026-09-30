@@ -163,6 +163,8 @@ implementação:
 | O resumo aceitava mais de 1000 caracteres: o `[limit]` da Taiga só mostra o contador e marca o erro | `maxlength` nativo: a digitação para em 1000 e a colagem é cortada. Medido no navegador: 995 + 20 digitados → 1000; 1500 colados → 1000 |
 | Na largura de celular (375 px), a tabela da listagem (~620 px) fazia a página inteira rolar na horizontal | A tabela fica numa região com rolagem horizontal própria (focável pelo teclado); a página mantém a largura da tela |
 | Área de soltar do PDF apertada e sem indicação visual de envio de arquivo | Área com 144 px de altura e ícone de upload (`@tui.cloud-upload`) centralizado acima do texto. O seletor inclui `label[tuiInputFiles]` para vencer a regra `[data-size]` da Taiga sem `!important`. O teste do texto também pegou um espaço que o Angular removia ("arquivoou") |
+| A listagem não tinha paginação | Paginação **no servidor**, com 10 por página por padrão (`GET /api/candidates?page=&pageSize=`, `OFFSET/FETCH` no SQL Server e total no mesmo lote). Na tela, o rodapé segue o exemplo "Footer" da tabela da Taiga (`caption[tuiCaption]`): total ("25 candidatos", no lugar do "999 rows" do exemplo), botão `tuiButtonSelect` "Exibindo X–Y" com `tui-data-list-wrapper` (10, 20 ou 50 por página) e `tui-pagination`. Página e tamanho ficam na URL (`?pagina=N&itens=M`); ao trocar o tamanho, a nova página é a que contém o primeiro item exibido; "Voltar para a lista" volta à mesma página e tamanho. A spec, o contrato e as tarefas (fase 7) foram atualizados antes do código |
+| Na listagem, uma área de interesse longa **sem espaços** (250 caracteres de teste) não quebrava: sem ponto de quebra, a coluna ficou com 1.711 px e a tabela, com 2.283 px, mesmo no desktop | `overflow-wrap: anywhere` nas células e colunas com largura fixa (`table-layout: fixed`). Sem as larguras fixas, a quebra funcionava, mas a coluna da área tomava o espaço das outras e os e-mails quebravam em 3 linhas. Validado a 1.200 px e 375 px |
 | Toasts no canto superior direito (padrão da Taiga) | Posição global centralizada no topo (`tuiNotificationOptionsProvider`, no `app.config.ts`). O provider na raiz leva o módulo de notificações para o bundle inicial (+8,6 kB comprimidos, antes carregados sob demanda). Por isso o limite de aviso do bundle inicial passou de 500 kB para 550 kB |
 
 **Falsos alarmes investigados e descartados**: duas falhas do roteiro E2E (erros que
@@ -177,13 +179,13 @@ Resultados da validação final, feita em 2026-09-29 a partir de um ambiente zer
 | Gate / verificação | Resultado |
 |--------------------|-----------|
 | Build TypeScript `strict`: backend (`tsc`) e frontend (`ng build`) | ✅ sem erros |
-| Testes do backend (Vitest + supertest) | ✅ **102 testes**, 12 arquivos |
-| Testes do frontend (Vitest + jsdom) | ✅ **88 testes**, 13 arquivos (cada componente com seu `*.spec.ts`) |
+| Testes do backend (Vitest + supertest) | ✅ **118 testes**, 12 arquivos |
+| Testes do frontend (Vitest + jsdom) | ✅ **104 testes**, 13 arquivos (cada componente com seu `*.spec.ts`) |
 | `docker compose up --build` do zero | ✅ os 3 containers saudáveis em **28 s** (com imagens em cache), migration aplicada automaticamente |
-| Roteiro E2E no navegador (Playwright + Chromium, contra o compose) | ✅ **28/28** verificações |
+| Roteiro E2E no navegador (Playwright + Chromium, contra o compose) | ✅ **28/28** verificações, mais 12/12 da paginação e da quebra de texto e 10/10 do rodapé (itens por página) |
 | Roteiro do [quickstart.md](specs/001-candidate-registration/quickstart.md) (API e interface) | ✅ todos os cenários |
 | Roteiros do README para rodar backend e frontend separadamente | ✅ executados como estão escritos |
-| Testes em containers (`docker build --target test`), sem Node local | ✅ 102 no backend e 88 no frontend |
+| Testes em containers (`docker build --target test`), sem Node local | ✅ 118 no backend e 104 no frontend |
 | Commitlint (`hotfix`/`breaking` aceitos, mensagem livre recusada) e `pnpm release:dry` | ✅ |
 | Revisão de segurança: sem segredos versionados, `.env` ignorado, sem `X-Powered-By`, nenhum PDF gravado em disco, logs sem dados pessoais | ✅ |
 
@@ -256,6 +258,6 @@ Resultados da validação final, feita em 2026-09-29 a partir de um ambiente zer
 5. **Usuário de banco dedicado** com permissões mínimas, em vez do `sa`.
 6. **Tag fixa do SQL Server** (ex.: `2025-CU9-ubuntu-24.04`), para builds reprodutíveis.
 7. **Pacote de validação compartilhado** (workspace pnpm), se as regras crescerem.
-8. **Busca, filtros e paginação** na listagem, e edição e exclusão de candidatos.
+8. **Busca e filtros** na listagem, e edição e exclusão de candidatos.
 9. **Testes E2E versionados** no repositório (o roteiro Playwright desta validação foi feito
    à parte) e rodando no CI.

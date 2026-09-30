@@ -71,7 +71,11 @@ curl -s -X POST http://localhost:3000/api/candidates -H 'Content-Type: applicati
 | Ação                                                          | Esperado                                                        |
 |---------------------------------------------------------------|-----------------------------------------------------------------|
 | Abrir `/candidatos` com o banco vazio (antes do passo 3, ou depois de `docker compose down -v`) | Mensagem de lista vazia com o atalho para cadastrar |
-| Abrir `/candidatos` depois do passo 3                         | Candidatos do mais recente ao mais antigo                       |
+| Abrir `/candidatos` depois do passo 3                         | Candidatos do mais recente ao mais antigo, até 10 por página; rodapé com "N candidatos", "Exibindo 1–10" e a paginação |
+| Com mais de 10 candidatos, clicar em "2" na paginação         | URL `/candidatos?pagina=2`, "Exibindo 11–20"; abrir um candidato e "Voltar para a lista" volta à página 2 |
+| Clicar em "Exibindo 1–10" e escolher "20 por página"          | URL `?itens=20`, até 20 linhas; a paginação mantém o tamanho |
+| Abrir `/candidatos?pagina=99` e `/candidatos?pagina=abc`      | Vai para a última página; abre a página 1                       |
+| Candidato com área de interesse longa, inclusive sem espaços  | O texto quebra dentro da coluna; a página não rola na horizontal (inclusive a 375 px) |
 | Clicar em uma linha                                           | Detalhes com todos os campos, acentos e quebras de linha intactos |
 | Abrir `/candidatos/999999`                                    | "Candidato não encontrado..." e o botão de voltar               |
 
@@ -88,15 +92,17 @@ docker compose exec -T db bash -c "$SQL \"SET NOCOUNT ON;
   FROM (SELECT ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) AS n
         FROM sys.all_objects a CROSS JOIN sys.all_objects b) t;\""
 
-for i in 1 2 3; do
-  curl -s -o /dev/null -w 'GET /api/candidates: %{time_total}s\n' http://localhost:4200/api/candidates
+for page in 1 50 100; do
+  curl -s -o /dev/null -w "GET /api/candidates?page=$page: %{time_total}s\n" \
+    "http://localhost:4200/api/candidates?page=$page"
 done
 
 docker compose exec -T db bash -c "$SQL \"DELETE FROM dbo.Candidates WHERE Email LIKE N'carga%@example.com';\""
 ```
 
-**Esperado**: cada chamada abaixo de **2 s**. Medido em 2026-09-29: cerca de 0,02 s com 1.002
-candidatos. Com os dados de carga ainda no banco, abrir `/candidatos` no navegador também
+**Esperado**: cada chamada abaixo de **2 s**, inclusive nas páginas finais (`OFFSET` alto).
+Medido em 2026-09-29: cerca de 0,02 s com 1.002 candidatos, antes da paginação; com a
+paginação, cada resposta traz só 10 itens e o total. Com os dados de carga ainda no banco, abrir `/candidatos` no navegador também
 deve mostrar a lista em até 2 s.
 
 ## 5. Cadastro com PDF (História 3, FR-014 a FR-024, SC-002 a SC-005)

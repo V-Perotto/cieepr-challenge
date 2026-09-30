@@ -838,6 +838,50 @@ cadastro e nunca o bloqueia.
 
 ---
 
+## Phase 7: Ajustes da revisão do autor (2026-09-29)
+
+**Purpose**: paginação da listagem (10 por página) e quebra de textos longos na tabela
+(spec, *Clarifications*, sessão "revisão do autor"; FR-025).
+
+- [X] T090 [P] [US2] Backend, testes: em `backend/tests/unit/services/candidate.service.spec.ts`,
+  `list` com padrão `page=1, pageSize=10` (offset 0, limit 10), página 3 com `pageSize=5`
+  (offset 10, limit 5), resposta `{ items, page, pageSize, total }`, e `page`/`pageSize`
+  inválidos (`0`, `-1`, `abc`, `1.5`, `pageSize=51`) → `InvalidPaginationError`, sem consultar
+  o repositório. Em `backend/tests/http/candidates.read.spec.ts`: 12 candidatos → a página 1
+  traz 10 e `total: 12`, a página 2 traz 2, a página 99 traz `items: []`, e parâmetro inválido
+  → 400 `VALIDATION_ERROR` "Parâmetros de paginação inválidos.".
+- [X] T091 [US2] Backend: `CandidateRepository.list({ offset, limit })` →
+  `{ items, total }`. O `MssqlCandidateRepository` usa `ORDER BY CreatedAt DESC, Id DESC OFFSET
+  @offset ROWS FETCH NEXT @limit ROWS ONLY` e `COUNT(*)` no mesmo lote. Atualizar o fake.
+- [X] T092 [US2] Backend: `InvalidPaginationError` em `backend/src/domain/errors.ts`;
+  `CandidateService.list(query)` valida `page` (inteiro ≥ 1) e `pageSize` (1 a 50, padrão
+  10); `GET /api/candidates` repassa `req.query` e responde `CandidatePage`
+  ([openapi.yaml](./contracts/openapi.yaml)).
+- [X] T093 [P] [US2] Frontend, testes: `candidates.store.spec.ts` (`loadList(page)`, `total`,
+  `totalPages`, `isEmpty`) e `candidate-list-page.component.spec.ts` (resumo "Mostrando X–Y de
+  N candidatos", `tui-pagination` só com mais de uma página, troca de página navega com
+  `?pagina=N`, `?pagina=` inválido carrega a página 1, página além da última vai para a última).
+- [X] T094 [US2] Frontend: `CandidatePage` em `candidate.models.ts`;
+  `CandidatesApiService.list(page, pageSize)`; `CandidatesStore` com `page`, `pageSize` (10),
+  `total` e `totalPages`; a listagem lê `pagina` da URL (input da rota) e usa `tui-pagination`.
+- [X] T095 [US2] Frontend: `candidate-table.component.scss` com `overflow-wrap: anywhere` nas
+  células de texto e largura mínima da tabela (40rem) para as colunas não ficarem espremidas no
+  celular. Validar no navegador com uma área de 250 caracteres sem espaços.
+- [X] T096 Atualizar o [quickstart.md](./quickstart.md) (passos 4 e 4.1), o roteiro E2E e o
+  `DESENVOLVIMENTO.md` (seções 5 e 6).
+
+- [X] T097 [P] [US2] Frontend, testes: o rodapé da listagem segue o exemplo "Footer" da tabela da
+  Taiga (`caption[tuiCaption]`), com o total ("25 candidatos"/"1 candidato"), o botão
+  "Exibindo X–Y" (`tuiButtonSelect` + `tui-data-list-wrapper` com 10/20/50 por página) e a
+  `tui-pagination`. `?itens=` válido/inválido, troca de tamanho mantendo o primeiro item visível e
+  "Voltar para a lista" preservando `pagina` e `itens`.
+- [X] T098 [US2] Frontend: `CandidatesStore` com `pageSize` em sinal e `pageSizes = [10, 20, 50]`;
+  `CandidateTableComponent` projeta o rodapé num `caption[tuiCaption]`; a listagem troca o resumo
+  "Mostrando X–Y de N" pelo rodapé e lê `itens` da URL.
+- [X] T099 Atualizar o roteiro E2E (total lido do rodapé) e o `DESENVOLVIMENTO.md`.
+
+---
+
 ## Dependencies & Execution Order
 
 ### Phase Dependencies

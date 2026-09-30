@@ -51,6 +51,15 @@
   completo com DDD? → A: Exigir 10 ou 11 dígitos (DDD + número fixo ou celular); menos que
   isso é recusado.
 
+### Session 2026-09-29 (revisão do autor após a implementação)
+
+- Q: A listagem deve ser paginada? → A: Sim. A paginação é feita no servidor, com 10 candidatos
+  por página por padrão, e a página atual fica na URL.
+- Q: Como os controles da paginação devem ser apresentados? → A: No padrão de rodapé de tabela da
+  Taiga UI: total de candidatos, seletor de itens por página (10, 20 ou 50) e paginação.
+- Q: Como a listagem deve se comportar com textos longos, inclusive sem espaços? → A: O texto
+  quebra dentro da célula; a tabela não pode crescer além da tela por causa de um valor longo.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Cadastro manual de candidato (Priority: P1)
@@ -106,9 +115,10 @@ aparecem e abrir os detalhes de um deles, conferindo cada campo.
 
 **Acceptance Scenarios**:
 
-1. **Given** candidatos cadastrados, **When** a pessoa abre a listagem, **Then** vê um item por
-   candidato com nome, e-mail, área ou cargo de interesse e data do cadastro, do mais recente
-   para o mais antigo.
+1. **Given** candidatos cadastrados, **When** a pessoa abre a listagem, **Then** vê até 10
+   candidatos, com nome, e-mail, área ou cargo de interesse e data do cadastro, do mais recente
+   para o mais antigo. O rodapé da tabela mostra o total ("42 candidatos"), o intervalo exibido
+   ("Exibindo 1–10"), o seletor de itens por página e a paginação.
 2. **Given** a listagem aberta, **When** a pessoa seleciona um candidato, **Then** abre a tela de
    detalhes com todos os campos do cadastro e a data e hora em que foi feito.
 3. **Given** nenhum candidato cadastrado, **When** a pessoa abre a listagem, **Then** vê uma
@@ -118,6 +128,12 @@ aparecem e abrir os detalhes de um deles, conferindo cada campo.
    para a listagem.
 5. **Given** um cadastro recém-salvo, **When** a pessoa abre a listagem, **Then** esse candidato
    já aparece, sem precisar de nenhuma outra ação.
+6. **Given** mais de 10 candidatos, **When** a pessoa escolhe a página 2 na paginação, **Then**
+   vê os próximos 10 e o endereço passa a ser `/candidatos?pagina=2`. Voltar dos detalhes para a
+   listagem mantém a página. Ao escolher "20 por página", a lista passa a mostrar 20 itens
+   (`?itens=20`), começando pela página que contém o primeiro item exibido.
+7. **Given** um candidato com área de interesse longa (inclusive sem espaços), **When** a pessoa
+   abre a listagem, **Then** o texto quebra dentro da célula e a página não rola na horizontal.
 
 ---
 
@@ -261,8 +277,12 @@ corrompido) e conferir as mensagens e que o cadastro manual continua funcionando
 
 **Consulta**
 
-- **FR-025**: O sistema DEVE listar todos os candidatos cadastrados, mostrando nome, e-mail,
-  área ou cargo de interesse e data do cadastro, do mais recente para o mais antigo.
+- **FR-025**: O sistema DEVE listar os candidatos cadastrados **paginados, com 10 por página
+  por padrão**, mostrando nome, e-mail, área ou cargo de interesse e data do cadastro, do mais
+  recente para o mais antigo. A listagem DEVE mostrar o total de candidatos, permitir escolher
+  10, 20 ou 50 itens por página, permitir navegar entre as páginas e manter a página e o tamanho
+  no endereço (`?pagina=N&itens=M`). Textos longos DEVEM quebrar
+  dentro da célula.
 - **FR-026**: A partir da listagem, o sistema DEVE permitir abrir uma tela de detalhes com todos
   os dados do candidato selecionado, incluindo a data e a hora do cadastro.
 - **FR-027**: Quando não houver candidatos, a listagem DEVE mostrar uma mensagem de lista vazia
@@ -330,7 +350,8 @@ corrompido) e conferir as mensagens e que o cadastro manual continua funcionando
 - **Retenção de dados**: como o PDF é descartado depois da extração, a aplicação guarda só os
   campos do formulário, o que reduz a exposição de dados pessoais (LGPD).
 - **Fora do escopo desta versão**: login e controle de acesso, editar e excluir candidatos,
-  busca, filtros e paginação da listagem.
-- **Volume**: até alguns milhares de candidatos, compatível com uma listagem sem paginação.
+  busca e filtros na listagem.
+- **Volume**: até alguns milhares de candidatos. A listagem é paginada no servidor, então o
+  tempo de resposta não cresce com o total.
 - **Dados de exemplo**: os currículos PDF do repositório usam só dados fictícios, conforme o
   Princípio VI da constituição.
