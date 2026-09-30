@@ -43,3 +43,17 @@ label[tuiInputFiles].resume-upload__drop {
     display: none;
   }
 }
+
+// "Trocar arquivo": o input fica sobre o botão, invisível, para abrir o seletor nativo.
+.resume-upload__replace {
+  position: relative;
+  align-self: flex-start;
+  overflow: hidden;
+}
+
+.resume-upload__replace-input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}

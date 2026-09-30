@@ -4,6 +4,24 @@
     <tui-files>
       <tui-file [file]="file" (remove)="remove()" />
     </tui-files>
+    <!-- Anexar outro PDF substitui o atual, sem precisar removê-lo antes (spec: "Um PDF por cadastro"). -->
+    <label
+      tuiButton
+      appearance="flat"
+      size="s"
+      iconStart="@tui.refresh-cw"
+      class="resume-upload__replace"
+    >
+      Trocar arquivo
+      <input
+        type="file"
+        class="resume-upload__replace-input"
+        accept="application/pdf,.pdf"
+        aria-label="Trocar o currículo em PDF"
+        aria-describedby="resume-upload-hint"
+        (change)="onReplace($event)"
+      />
+    </label>
   } @else {
     <label tuiInputFiles class="resume-upload__drop">
       <input

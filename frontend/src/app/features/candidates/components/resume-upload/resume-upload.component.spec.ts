@@ -88,4 +88,45 @@ describe('ResumeUploadComponent', () => {
     expect(removed).toBe(1);
     expect((fixture.nativeElement as HTMLElement).querySelector('input[type="file"]')).not.toBeNull();
   });
+
+  describe('trocar o arquivo sem remover antes (spec: "Um PDF por cadastro")', () => {
+    /** Simula a escolha de um arquivo no input de troca (jsdom não tem DataTransfer). */
+    async function replaceWith(file: File) {
+      const input = (fixture.nativeElement as HTMLElement).querySelector<HTMLInputElement>(
+        '.resume-upload__replace input[type="file"]',
+      )!;
+      Object.defineProperty(input, 'files', { value: [file], configurable: true });
+      input.dispatchEvent(new Event('change'));
+      await fixture.whenStable();
+    }
+
+    beforeEach(async () => {
+      component.control.setValue(pdf(10, 'primeiro.pdf'));
+      await fixture.whenStable();
+    });
+
+    it('com um arquivo escolhido, oferece "Trocar arquivo" com ícone e input só de PDF', () => {
+      const el = fixture.nativeElement as HTMLElement;
+      const replace = el.querySelector<HTMLLabelElement>('label.resume-upload__replace');
+      expect(replace?.textContent?.trim()).toBe('Trocar arquivo');
+      expect(replace?.getAttribute('iconStart')).toBe('@tui.refresh-cw');
+      expect(replace?.querySelector<HTMLInputElement>('input[type="file"]')?.accept).toContain('application/pdf');
+    });
+
+    it('um PDF válido substitui o anterior e emite fileSelected', async () => {
+      const second = pdf(20, 'segundo.pdf');
+      await replaceWith(second);
+      expect(selected.map((f) => f.name)).toEqual(['primeiro.pdf', 'segundo.pdf']);
+      const shown = (fixture.nativeElement as HTMLElement).querySelector('tui-file');
+      expect(shown?.textContent?.replace(/\s+/g, '')).toContain('segundo.pdf');
+    });
+
+    it('um arquivo inválido é recusado e o PDF atual continua escolhido', async () => {
+      await replaceWith(pdf(10, 'foto.jpg', 'image/jpeg'));
+      expect(rejected).toEqual(['Formato não aceito. Envie o currículo em PDF.']);
+      expect(selected).toHaveLength(1);
+      const shown = (fixture.nativeElement as HTMLElement).querySelector('tui-file');
+      expect(shown?.textContent?.replace(/\s+/g, '')).toContain('primeiro.pdf');
+    });
+  });
 });

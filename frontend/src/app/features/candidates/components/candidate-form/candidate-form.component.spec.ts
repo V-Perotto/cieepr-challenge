@@ -337,6 +337,24 @@ describe('CandidateFormComponent', () => {
       expect(status()).toBe('');
     });
 
+    it('trocar o PDF processa o novo arquivo e preenche só os campos ainda vazios', async () => {
+      await select(
+        of({ ...full, fields: { ...full.fields, phone: null }, identified: ['fullName', 'email'], notIdentified: ['phone'] }),
+      );
+      const second: ResumeExtractionResult = {
+        fields: { fullName: 'Outro Nome', email: 'outro@example.org', phone: '41999998888' },
+        identified: ['fullName', 'email', 'phone'],
+        notIdentified: [],
+        pagesRead: 1,
+      };
+      await select(of(second));
+
+      expect(resumeApi.extract).toHaveBeenCalledTimes(2);
+      expect(input('fullName').value).toBe('João Pereira');
+      expect(input('email').value).toBe('joao@example.org');
+      expect(input('phone').value).toBe('(41) 99999-8888');
+    });
+
     it('remover o arquivo mantém os valores já preenchidos', async () => {
       await select(of(full));
       upload().fileRemoved.emit();
