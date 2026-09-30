@@ -74,6 +74,11 @@ export class CandidateFormComponent {
   readonly saved = output<Candidate>();
 
   protected readonly maxLength = MAX_LENGTH;
+  /**
+   * O resumo cresce com o texto: começa com 4 linhas e só rola depois de 40, o suficiente para
+   * os 1000 caracteres mesmo num celular estreito (~30 caracteres por linha).
+   */
+  protected readonly summaryRows = { min: 4, max: 40 } as const;
   protected readonly phoneMask = PHONE_MASK;
   protected readonly saving = signal(false);
 

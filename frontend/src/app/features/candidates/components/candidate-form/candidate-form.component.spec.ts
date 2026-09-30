@@ -2,6 +2,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { By } from '@angular/platform-browser';
 import { type ComponentFixture, TestBed } from '@angular/core/testing';
 import { TuiNotificationService } from '@taiga-ui/core';
+import { TuiTextareaComponent } from '@taiga-ui/kit';
 import { of, Subject, throwError } from 'rxjs';
 import { CandidatesApiService } from '../../../../core/api/candidates-api.service';
 import { ResumeExtractionApiService } from '../../../../core/api/resume-extraction-api.service';
@@ -199,6 +200,20 @@ describe('CandidateFormComponent', () => {
 
   it('o botão Salvar começa habilitado', () => {
     expect(el.querySelector<HTMLButtonElement>('button[type="submit"]')!.disabled).toBe(false);
+  });
+
+  describe('Resumo profissional', () => {
+    it('barra a digitação e a colagem acima de 1000 caracteres (maxlength nativo)', () => {
+      expect(input('professionalSummary').getAttribute('maxlength')).toBe('1000');
+    });
+
+    it('cresce com o conteúdo de 4 até 40 linhas antes de rolar', () => {
+      const textarea = fixture.debugElement
+        .query(By.css('#candidate-professionalSummary'))
+        .injector.get(TuiTextareaComponent);
+      expect(textarea.min()).toBe(4);
+      expect(textarea.max()).toBe(40);
+    });
   });
 
   describe('currículo PDF', () => {

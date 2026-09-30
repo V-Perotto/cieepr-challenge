@@ -119,7 +119,10 @@
         [attr.aria-errormessage]="
           errors().professionalSummary ? 'candidate-professionalSummary-error' : null
         "
+        [attr.maxlength]="maxLength.professionalSummary"
         [limit]="maxLength.professionalSummary"
+        [min]="summaryRows.min"
+        [max]="summaryRows.max"
       ></textarea>
     </tui-textfield>
     <tui-error
