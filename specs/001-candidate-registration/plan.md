@@ -80,6 +80,21 @@ navegador moderno (evergreen).
 - Mensagens em pt-BR ([ui-contract.md](./contracts/ui-contract.md)).
 - Os 3 containers pedidos, com as portas 1433, 3000 e 4200→80.
 
+**UI e identidade visual** (decisões da revisão do autor; detalhes em
+[ui-contract.md](./contracts/ui-contract.md)):
+- **Paleta CIEE** sobre os tokens da Taiga 5, em `frontend/src/styles.scss`: azul `#00458c` em
+  `--tui-background-accent-1` e `--tui-text-action`, textos `#2b2b2b`/`#555555`, erros `#d13438`,
+  fundo da página `--tui-background-elevation-1` (`#f4f7fa`). O laranja (`--tui-background-accent-2`)
+  fica definido, mas não é usado em elementos (só no hover de links).
+- **Ícones** via `iconStart` do `tuiButton`: `@tui.user-plus` ("Novo candidato"), `@tui.save`
+  ("Salvar") e `@tui.refresh-cw` ("Trocar arquivo").
+- **Notificações** centralizadas no topo (`tuiNotificationOptionsProvider` no `app.config.ts`).
+- **Upload do PDF**: área de soltar com 144 px e ícone `@tui.cloud-upload`; com um arquivo escolhido,
+  "Trocar arquivo" substitui o PDF sem precisar removê-lo antes.
+- **Listagem**: rodapé no padrão "Footer" da tabela da Taiga (total, itens por página, paginação),
+  quebra de textos longos nas células e destaque `#e9eef3` na linha em hover ou foco.
+- **Resumo profissional**: `maxlength` de 1000 e crescimento de 4 a 40 linhas.
+
 **Scale/Scope**: alguns milhares de candidatos, poucos usuários ao mesmo tempo, sem login.
 São 3 telas (listagem, cadastro, detalhes) e 4 endpoints (`health`, listar, criar e detalhar
 candidatos, extrair currículo).

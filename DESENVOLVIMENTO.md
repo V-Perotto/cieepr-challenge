@@ -12,7 +12,7 @@ candidatos com importação de currículo em PDF. Este documento é um entregáv
 4. [Exemplos práticos de onde a IA ajudou](#4-exemplos-práticos-de-onde-a-ia-ajudou)
 5. [Ajustes, correções e descartes sobre o código gerado por IA](#5-ajustes-correções-e-descartes-sobre-o-código-gerado-por-ia)
 6. [Processo de validação e testes](#6-processo-de-validação-e-testes)
-7. [Tempo estimado e tempo real](#7-tempo-estimado-e-tempo-real)
+7. [Tempo real dedicado ao desafio](#7-tempo-real-dedicado-ao-desafio)
 8. [Dificuldades, limitações da extração de PDF e melhorias futuras](#8-dificuldades-limitações-da-extração-de-pdf-e-melhorias-futuras)
 
 ---
@@ -24,12 +24,18 @@ Cada etapa gerou um artefato versionado, e a etapa seguinte partiu dele:
 
 | Etapa | Comando | Artefato |
 |-------|---------|----------|
-| Princípios do projeto | `/speckit-constitution` | [`.specify/memory/constitution.md`](.specify/memory/constitution.md) (v1.0.0 e depois v1.1.0) |
+| Princípios do projeto | `/speckit-constitution` | [`.specify/memory/constitution.md`](.specify/memory/constitution.md) (v1.0.0, depois v1.1.0 e v1.2.0) |
 | Especificação funcional | `/speckit-specify` | [`spec.md`](specs/001-candidate-registration/spec.md): 3 histórias de usuário, 30 requisitos, 8 critérios de sucesso |
 | Esclarecimento de ambiguidades | `/speckit-clarify` | Seção *Clarifications* da spec (4 perguntas respondidas) |
 | Plano técnico | `/speckit-plan` | [`plan.md`](specs/001-candidate-registration/plan.md), [`research.md`](specs/001-candidate-registration/research.md) (R1 a R17), [`data-model.md`](specs/001-candidate-registration/data-model.md), [`contracts/`](specs/001-candidate-registration/contracts/), [`quickstart.md`](specs/001-candidate-registration/quickstart.md) |
 | Quebra em tarefas | `/speckit-tasks` | [`tasks.md`](specs/001-candidate-registration/tasks.md): 89 tarefas por história de usuário |
 | Implementação | `/speckit-implement` | `backend/`, `frontend/`, `samples/`, compose, workflows; tarefas marcadas `[X]` |
+
+**Como conduzi o trabalho.** Levei cerca de 2 h para projetar a especificação e escolher as
+ferramentas. Nessa fase, usei o Gemini 3.6 Flash (com *Thinking*) para refinar meus prompts antes
+de enviá-los ao Claude (Opus 5.5, com esforço *Extra High* no planejamento). Depois segui o fluxo
+do Spec Kit e, por fim, fiz ajustes finos: o limite máximo dos campos e a responsividade visual
+ao inserir textos longos.
 
 **Fluxo de branches** (constituição v1.1.0): todo o desenvolvimento acontece em `dev`. A
 integração no `main` é feita só por Pull Request com *merge commit*. O `semantic-release`
@@ -49,7 +55,17 @@ falhando.
 
 ## 2. Principais decisões técnicas e justificativas
 
-As justificativas completas, com as alternativas avaliadas, estão no
+**Escolha da stack.** Escolhi Angular, Node.js e pnpm por ter mais familiaridade com essas
+ferramentas. A exceção é o kit de UI: optei pela Taiga UI para usar algo diferente do Material,
+que é o mais comum, aproveitando a facilidade de implementação via *skill*. Isso consumiu menos
+tokens e menos prompts, com resultados mais rápidos e consistentes, sem tanta tentativa e erro.
+
+**Emendas da constituição** (registradas aqui, como a governança exige): v1.1.0 introduziu o
+fluxo `dev` → PR → `main` com *merge commit*; v1.2.0 passou a pedir no item 7 deste documento
+só o tempo real (aproximado), alinhado ao enunciado do desafio, porque não houve estimativa
+prévia.
+
+As justificativas técnicas completas, com as alternativas avaliadas, estão no
 [research.md](specs/001-candidate-registration/research.md). Resumo:
 
 | Tema | Decisão | Por quê |
@@ -64,7 +80,7 @@ As justificativas completas, com as alternativas avaliadas, estão no
 | Estado no Angular | Sinais (`CandidatesStore`) e Reactive Forms tipados; `toSignal(form.events)` para renderizar os erros em modo zoneless | Estado reativo exigido pela constituição, sem biblioteca extra |
 | Upload | multer em **memória** (limite de 5.242.880 bytes) e checagem da assinatura `%PDF-`, não da extensão | O PDF nunca é gravado em disco e é descartado depois da resposta (FR-024, LGPD) |
 | Versionamento | semantic-release no `main` (GitHub Actions), `releaseRules` customizadas, `CHANGELOG.md` e `package.json` da raiz | Constituição III. O `package.json` da raiz é a única fonte da versão da aplicação |
-| TypeScript | 6.0.3 nos dois projetos, `strict` | O Angular 22 exige a série 6.0; usar a mesma versão evita diferenças de checagem |
+| TypeScript | 6.0.3 nos dois projetos, `strict` | O Angular 22 só aceita nativamente a série 6.0 (o TypeScript 7, reescrito em Go e mais rápido, ficou de fora); usar a mesma versão nos dois lados evita diferenças de checagem |
 | Imagem Node | `node:26.10-bookworm-slim` + `npm i -g pnpm@11.21.0` | O Node 25+ não traz mais o Corepack |
 
 ## 3. Ferramentas de IA e modelos utilizados
@@ -72,10 +88,16 @@ As justificativas completas, com as alternativas avaliadas, estão no
 | Ferramenta | Uso |
 |------------|-----|
 | **Spec Kit** 1.0.11 (integração Claude, modo *skills*) | Estruturou o fluxo constitution → specify → clarify → plan → tasks → implement e os templates de cada artefato |
-| **Claude Code** com o modelo **Claude Opus 5.5** (`claude-opus-5-5`) | Constituição, spec, esclarecimentos, plano e tarefas; consulta de versões nos registries (Docker Hub, MCR, npm); spike de bibliotecas de PDF; implementação; testes E2E com Playwright; documentação |
-| **Gemini** | _a preencher pelo autor_: pesquisas pontuais (quais e quando) |
+| **Claude Code** com o modelo **Claude Opus 5.5** (`claude-opus-5-5`), com esforço *Extra High* no planejamento | Constituição, spec, esclarecimentos, plano e tarefas; consulta de versões nos registries (Docker Hub, MCR, npm); spike de bibliotecas de PDF; implementação; testes E2E com Playwright; documentação |
+| **Gemini 3.6 Flash** (modo *Thinking*) | Refinar os prompts antes de enviá-los ao Claude, na fase de especificação e escolha de ferramentas |
 
 ## 4. Exemplos práticos de onde a IA ajudou
+
+O Spec Kit deixa claro, visualmente, o que depende da minha validação e já traz recomendações
+de correção. Um exemplo é o relatório do `/speckit-analyze`, rodado depois da implementação, em
+que cada achado vem com a severidade, o local e a correção sugerida:
+
+![Relatório do /speckit-analyze: achados C1, C2, C3, A1, I1 e I2, com severidade, local e recomendação](docs/images/speckit-analyze-relatorio.png)
 
 1. **Constituição a partir de uma lista de princípios.**
    - *Pedido*: `/speckit-constitution` com os 7 princípios (stack, pnpm, semantic-release,
@@ -101,11 +123,60 @@ As justificativas completas, com as alternativas avaliadas, estão no
        o pnpm e o npm.
    - *Aproveitamento*: ajustes no plano (seção "Ajustes em relação à entrada") e uma decisão
      do autor sobre o `standard-version` (seção 5).
+
+   <details>
+   <summary>Prompt enviado ao <code>/speckit-plan</code></summary>
+
+   ```text
+   /speckit-plan Defina o plano técnico com as seguintes versões específicas:
+   - Node.js: node:26.10-bookworm-slim
+   - Angular: v22 usando Taiga-UI (v5.26.0) como UI Kit
+   - SQL Server: `mcr.microsoft.com/mssql/server:2025-latest`
+   - Biblioteca de parsing de PDF no backend: Escolher uma biblioteca leve em Node.js
+     (ex: `pdf-parse` ou `pdf2json`) com isolamento da lógica de extração em um serviço dedicado.
+
+   Configuração de Release & Versionamento (`package.json`):
+   - Incluir dependências: `semantic-release`, `@semantic-release/commit-analyzer`,
+     `@semantic-release/release-notes-generator`, `@semantic-release/changelog`,
+     `@semantic-release/npm`, `@semantic-release/github`, `@semantic-release/git`.
+   - Scripts no `package.json`:
+     - `"release": "standard-version"`
+     - `"prerelease": "standard-version --prerelease preview"`
+     - `"semantic": "semantic-release --branches main"`
+   - Configurar chave `"release"` no `package.json` com preset `conventionalcommits`,
+     plugins e regras de release.
+
+   Estrutura de Containers (docker-compose.yml):
+   1. db: SQL Server (1433:1433); volume persistente e Healthcheck configurado para garantir
+      disponibilidade do banco.
+   2. backend: API Node.js rodando no container, dependente da saúde do container db
+      (depends_on com condition: service_healthy); Mapeamento de porta 3000:3000.
+   3. frontend: App Angular v22 (Multi-stage build: Mesmo node para build com pnpm, Nginx alpine
+      para servir); Mapeamento da porta 4200 (host) para porta 80 (Nginx); Dependente do serviço
+      backend.
+
+   Estrutura de Banco de Dados:
+   - Scripts SQL de Migration/Initialization automatizados para criação da tabela de candidatos
+     no SQL Server na inicialização do container.
+
+   Estrutura de Arquivos de Documentação a Gerar:
+   - README.md: Guia de passo a passo para clonar, copiar `.env.example` para `.env`, executar
+     `docker-compose up --build`, testar com o arquivo da pasta `samples/` e descrição de
+     tecnologias/versões.
+   - DESENVOLVIMENTO.md: Estruturado com sumário navegável abordando todos os 8 pontos da
+     Constituição.
+   ```
+
+   </details>
 4. **Spike de bibliotecas de PDF.**
    - *Pedido*: escolher uma biblioteca leve (ex.: `pdf-parse` ou `pdf2json`).
    - *Resposta*: um script gerou PDFs de teste (uma coluna, duas colunas, só imagem, com
      senha, corrompido, ZIP renomeado) e comparou as bibliotecas (tabela no R3).
-   - *Aproveitamento*: a escolha do `unpdf`, e o formato dos PDFs de `samples/`.
+   - *Aproveitamento*: a escolha do `unpdf`, e o formato dos PDFs de `samples/`. A própria IA
+     testou qual biblioteca se encaixava melhor, logo depois do prompt acima, e mostrou o
+     resultado no resumo do plano:
+
+     ![Resumo do /speckit-plan: artefatos gerados, mudanças em relação ao pedido (incluindo a comparação das bibliotecas de PDF) e riscos](docs/images/speckit-plan-resumo.png)
 5. **Implementação guiada pelas tarefas.**
    - *Pedido*: `/speckit-implement`.
    - *Resposta*: as 89 tarefas executadas em ordem, com testes antes do código e checkpoints
@@ -115,6 +186,10 @@ As justificativas completas, com as alternativas avaliadas, estão no
      não pegavam (seção 5).
 
 ## 5. Ajustes, correções e descartes sobre o código gerado por IA
+
+Durante a implementação, analisei as atividades entregues e pedi correções pontuais, como a do
+healthcheck (acesso ao banco fora do repositório, item C1 da análise) e pequenos casos para
+completar a cobertura de testes.
 
 **Descartes feitos no planejamento:**
 
@@ -170,6 +245,14 @@ implementação:
 | O hover das linhas da listagem não aparecia: a cor ia no `tr`, mas o `td` da Taiga pinta o próprio fundo branco por cima | Destaque aplicado às células (`--tui-background-elevation-2`, `#e9eef3`) no hover e quando o link da linha recebe foco pelo teclado (`:focus-within`) |
 | Toasts no canto superior direito (padrão da Taiga) | Posição global centralizada no topo (`tuiNotificationOptionsProvider`, no `app.config.ts`). O provider na raiz leva o módulo de notificações para o bundle inicial (+8,6 kB comprimidos, antes carregados sob demanda). Por isso o limite de aviso do bundle inicial passou de 500 kB para 550 kB |
 
+**Correções vindas do `/speckit-converge`**, a verificação de lacunas entre spec, plano, tarefas e
+código:
+
+| Problema encontrado | Correção |
+|---------------------|----------|
+| A spec diz que anexar outro PDF substitui o anterior, mas era preciso remover o arquivo antes | Botão "Trocar arquivo" junto ao arquivo escolhido: o novo PDF substitui o atual e preenche só os campos ainda vazios; um arquivo inválido mostra a mensagem e mantém o atual. Validado no navegador (03 → 04: só o telefone veio do 2º PDF) |
+| Decisões visuais da revisão (paleta, ícones, toasts, área de soltar, destaque das linhas) documentadas só no ui-contract e aqui | Registradas também no `plan.md` (Technical Context, "UI e identidade visual") |
+
 **Falsos alarmes investigados e descartados**: duas falhas do roteiro E2E (erros que
 "não apareciam" e mensagens antigas depois do PDF) eram só o roteiro lendo a tela antes do
 ciclo de renderização zoneless. O estado dos controles já estava correto no mesmo instante.
@@ -183,14 +266,18 @@ Resultados da validação final, feita em 2026-09-29 a partir de um ambiente zer
 |--------------------|-----------|
 | Build TypeScript `strict`: backend (`tsc`) e frontend (`ng build`) | ✅ sem erros |
 | Testes do backend (Vitest + supertest) | ✅ **118 testes**, 12 arquivos |
-| Testes do frontend (Vitest + jsdom) | ✅ **104 testes**, 13 arquivos (cada componente com seu `*.spec.ts`) |
+| Testes do frontend (Vitest + jsdom) | ✅ **108 testes**, 13 arquivos (cada componente com seu `*.spec.ts`) |
 | `docker compose up --build` do zero | ✅ os 3 containers saudáveis em **28 s** (com imagens em cache), migration aplicada automaticamente |
 | Roteiro E2E no navegador (Playwright + Chromium, contra o compose) | ✅ **28/28** verificações, mais 12/12 da paginação e da quebra de texto e 10/10 do rodapé (itens por página) |
 | Roteiro do [quickstart.md](specs/001-candidate-registration/quickstart.md) (API e interface) | ✅ todos os cenários |
 | Roteiros do README para rodar backend e frontend separadamente | ✅ executados como estão escritos |
-| Testes em containers (`docker build --target test`), sem Node local | ✅ 118 no backend e 104 no frontend |
+| Testes em containers (`docker build --target test`), sem Node local | ✅ 118 no backend e 108 no frontend |
 | Commitlint (`hotfix`/`breaking` aceitos, mensagem livre recusada) e `pnpm release:dry` | ✅ |
 | Revisão de segurança: sem segredos versionados, `.env` ignorado, sem `X-Powered-By`, nenhum PDF gravado em disco, logs sem dados pessoais | ✅ |
+
+**Validação manual do autor.** Fiz uma análise primária do banco pelo DBeaver, para confirmar a
+conexão e a inserção dos dados. Depois revisei os cenários do código que tratam dos envios à API
+e os testes, para validar as regras de negócio.
 
 **Critérios de sucesso medidos:**
 
@@ -216,14 +303,17 @@ Resultados da validação final, feita em 2026-09-29 a partir de um ambiente zer
 - **Componentes Angular**: renderização, mensagens, estados de carregamento, vazio e erro,
   envio duplo e a máquina de estados do PDF.
 
-## 7. Tempo estimado e tempo real
+## 7. Tempo real dedicado ao desafio
 
-| Etapa | Estimado | Real |
-|-------|----------|------|
-| Especificação e plano (Spec Kit) | _a preencher pelo autor_ | _a preencher pelo autor_ |
-| Implementação | _a preencher pelo autor_ | _a preencher pelo autor_ |
-| Validação e documentação | _a preencher pelo autor_ | _a preencher pelo autor_ |
-| **Total** | _a preencher pelo autor_ | _a preencher pelo autor_ |
+| Etapa | Tempo real (aproximado) |
+|-------|-------------------------|
+| Especificação, plano e escolha das ferramentas (Spec Kit) | ~2 h |
+| Implementação, com ajustes | 4 a 5 h |
+| Validação (testes manuais, correções e pedidos à parte) | incluída nas etapas acima |
+| **Total** | **~6 h** |
+
+A maior parte do tempo de implementação foi o próprio Claude implementando e testando. A minha
+parte foi analisar o que foi entregue e pedir correções.
 
 ## 8. Dificuldades, limitações da extração de PDF e melhorias futuras
 
@@ -237,6 +327,16 @@ Resultados da validação final, feita em 2026-09-29 a partir de um ambiente zer
   `amd64`, o que levou às migrations no backend e à nota sobre Rosetta no README.
 - **Testes de componentes da Taiga no jsdom**: exigiram providers globais e polyfills de APIs
   do navegador.
+- **Estruturar o trabalho em SDD (Spec-Driven Development)**: foi a maior dificuldade, por ser
+  um modelo novo no desenvolvimento com IA. Quanto mais vezes é usado, mais fácil fica descrever
+  o processo de criação de uma aplicação.
+
+### Limitações da aplicação
+
+- **Listagem no celular**: a tabela, no estilo planilha, é funcional, mas visualmente simples
+  demais no celular. As outras telas ficam agradáveis nessa largura.
+- **TypeScript 6 em vez do 7**: o Angular 22 só aceita nativamente o TypeScript 6; o 7, reescrito
+  em Go, traz melhorias principalmente de desempenho.
 
 ### Limitações da extração de PDF
 
@@ -253,7 +353,9 @@ Resultados da validação final, feita em 2026-09-29 a partir de um ambiente zer
 ### Melhorias futuras
 
 1. **Autenticação e perfis de acesso** (fora do escopo por decisão da spec). Hoje qualquer
-   pessoa com acesso ao endereço cadastra e consulta.
+   pessoa com acesso ao endereço cadastra e consulta. A ausência de login mantém o sistema
+   simples, mas, se a aplicação fosse usada pela internet ou numa intranet, eu adicionaria
+   senhas com hash Argon2id e segundo fator TOTP, para proteger os dados dos candidatos.
 2. **OCR** (ex.: Tesseract) para PDFs digitalizados, com aviso de confiança baixa.
 3. **Identificação de nome mais robusta**: NER ou um LLM, ou pontuação por posição e tamanho
    da fonte (o pdf.js informa a altura de cada trecho de texto).
@@ -261,6 +363,10 @@ Resultados da validação final, feita em 2026-09-29 a partir de um ambiente zer
 5. **Usuário de banco dedicado** com permissões mínimas, em vez do `sa`.
 6. **Tag fixa do SQL Server** (ex.: `2025-CU9-ubuntu-24.04`), para builds reprodutíveis.
 7. **Pacote de validação compartilhado** (workspace pnpm), se as regras crescerem.
-8. **Busca e filtros** na listagem, e edição e exclusão de candidatos.
+8. **Barra de pesquisa e filtros** na listagem, para encontrar um candidato com mais facilidade,
+   e edição e exclusão de candidatos.
 9. **Testes E2E versionados** no repositório (o roteiro Playwright desta validação foi feito
    à parte) e rodando no CI.
+10. **Listagem em cards no celular e PWA**: trocar a tabela por cards em telas pequenas, que é
+    menos simples que a tabela, mas mais agradável e responsivo, e disponibilizar a aplicação
+    como PWA, para facilitar o cadastro de candidatos pelo celular.

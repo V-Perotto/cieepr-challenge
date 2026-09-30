@@ -1021,3 +1021,11 @@ Com mais de uma pessoa, depois da Fase 2:
 - Atualizar as seções 4 e 5 do `DESENVOLVIMENTO.md` ao fim de cada fase (constituição, VII).
 - Stop at any checkpoint to validate story independently
 - Avoid: vague tasks, same file conflicts, cross-story dependencies that break independence
+
+---
+
+## Phase 8: Convergence
+
+- [X] T100 CRITICAL: Preencher no `DESENVOLVIMENTO.md` a seção 7 (tempo estimado e tempo real de especificação e plano, implementação, validação e documentação, e total) e a linha do Gemini na seção 3 (pesquisas feitas e quando, ou remover a linha se ele não foi usado); hoje as duas estão como "_a preencher pelo autor_" e só o autor tem esses dados per Constitution VII (partial)
+- [X] T101 Permitir trocar o currículo PDF direto quando já há um arquivo escolhido, sem precisar removê-lo antes (ex.: ação "Trocar arquivo" junto ao `<tui-file>` em `frontend/src/app/features/candidates/components/resume-upload/`): o novo arquivo substitui o anterior e preenche só os campos vazios, com teste em `resume-upload.component.spec.ts` e no spec do formulário per spec: Assumptions "Um PDF por cadastro" e Edge Cases "Segundo PDF anexado" (partial)
+- [X] T102 Registrar no `plan.md` (Technical Context e mapeamento de componentes) as decisões visuais já implementadas e hoje documentadas só no ui-contract e no `DESENVOLVIMENTO.md`: paleta CIEE sobre os tokens da Taiga 5 (`frontend/src/styles.scss`), ícones `@tui.user-plus` e `@tui.save`, toasts centralizados no topo (`tuiNotificationOptionsProvider`), ícone e espaçamento da área de soltar do PDF e destaque das linhas da listagem per plan: rastreabilidade (unrequested)

@@ -30,7 +30,7 @@ componente e o [quickstart](../quickstart.md) conferem os textos deste arquivo.
 | Telefone                      | `phone`               | `<tui-textfield>` + `tuiInput` + Maskito | Máscara `(00) 0000-0000` / `(00) 00000-0000` |
 | Área ou cargo de interesse    | `areaOfInterest`      | `<tui-textfield>` + `tuiInput`        | `maxlength=250`                             |
 | Resumo profissional           | `professionalSummary` | `<tui-textfield>` + `tuiTextarea`     | `maxlength=1000` (barra digitação e colagem), contador `n / 1000`; cresce com o texto de 4 a 40 linhas |
-| Currículo em PDF (opcional)   | -                     | `label[tuiInputFiles]` + `<tui-file>` | `accept="application/pdf,.pdf"`, 5 MB; área de soltar com ícone de upload centralizado acima de "Escolha um arquivo ou arraste ele aqui" (no celular, só "Escolha um arquivo"); ao arrastar: "Solte o arquivo aqui" |
+| Currículo em PDF (opcional)   | -                     | `label[tuiInputFiles]` + `<tui-file>` | `accept="application/pdf,.pdf"`, 5 MB; área de soltar com ícone de upload centralizado acima de "Escolha um arquivo ou arraste ele aqui" (no celular, só "Escolha um arquivo"); ao arrastar: "Solte o arquivo aqui". Com um arquivo escolhido: botão "Trocar arquivo" (`@tui.refresh-cw`) substitui o PDF sem removê-lo antes; um arquivo inválido na troca mostra a mensagem e mantém o atual |
 
 Comportamento:
 - Os erros aparecem junto ao campo quando ele perde o foco e também ao tentar salvar (FR-008).
