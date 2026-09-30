@@ -4,8 +4,10 @@ import { runMigrations } from './db/migrate.js';
 import { connectWithRetry, createPool } from './db/pool.js';
 import { UnpdfTextExtractor } from './extraction/pdf-text-extractor.js';
 import { createLogger } from './logger.js';
+import { MssqlDatabaseHealthRepository } from './repositories/database-health.repository.js';
 import { MssqlCandidateRepository } from './repositories/mssql-candidate.repository.js';
 import { CandidateService } from './services/candidate.service.js';
+import { HealthService } from './services/health.service.js';
 import { ResumeExtractionService } from './services/resume-extraction.service.js';
 
 async function main(): Promise<void> {
@@ -23,10 +25,7 @@ async function main(): Promise<void> {
 
   const app = createApp({
     logger,
-    checkDatabase: async () => {
-      await pool.request().query('SELECT 1');
-      return true;
-    },
+    healthService: new HealthService(new MssqlDatabaseHealthRepository(pool)),
     candidateService: new CandidateService(new MssqlCandidateRepository(pool)),
     resumeExtractionService: new ResumeExtractionService(new UnpdfTextExtractor(), logger, {
       timeoutMs: config.pdfExtractionTimeoutMs,

@@ -6,12 +6,13 @@ import { createResumeExtractionsRouter } from './controllers/resume-extractions.
 import { createErrorHandler } from './http/error-handler.js';
 import type { Logger } from './logger.js';
 import type { CandidateService } from './services/candidate.service.js';
+import type { HealthService } from './services/health.service.js';
 import type { ResumeExtractionService } from './services/resume-extraction.service.js';
 
 /** Dependências injetadas manualmente (Controller → Service → Repository). */
 export interface AppDependencies {
   logger: Logger;
-  checkDatabase: () => Promise<boolean>;
+  healthService: HealthService;
   candidateService: CandidateService;
   resumeExtractionService: ResumeExtractionService;
 }
@@ -22,7 +23,7 @@ export function createApp(deps: AppDependencies): Express {
   app.use(pinoHttp({ logger: deps.logger, autoLogging: { ignore: (req) => req.url === '/api/health' } }));
   app.use(express.json({ limit: '100kb' }));
 
-  app.use('/api/health', createHealthRouter(deps.checkDatabase));
+  app.use('/api/health', createHealthRouter(deps.healthService));
   app.use('/api/candidates', createCandidatesRouter(deps.candidateService));
   app.use('/api/resume-extractions', createResumeExtractionsRouter(deps.resumeExtractionService));
 
