@@ -15,23 +15,37 @@ export class CandidatesStore {
   private listRequest?: Subscription;
   private detailRequest?: Subscription;
 
+  /** Tamanhos de página oferecidos no rodapé da listagem (FR-025); o primeiro é o padrão. */
+  readonly pageSizes = [10, 20, 50] as const;
+
   private readonly _items = signal<CandidateSummary[]>([]);
+  private readonly _page = signal(1);
+  private readonly _pageSize = signal<number>(this.pageSizes[0]);
+  private readonly _total = signal(0);
   private readonly _listStatus = signal<ListStatus>('idle');
   private readonly _selected = signal<Candidate | null>(null);
   private readonly _detailStatus = signal<DetailStatus>('idle');
 
   readonly items = this._items.asReadonly();
+  readonly page = this._page.asReadonly();
+  readonly pageSize = this._pageSize.asReadonly();
+  readonly total = this._total.asReadonly();
+  readonly totalPages = computed(() => Math.ceil(this._total() / this._pageSize()));
   readonly listStatus = this._listStatus.asReadonly();
   readonly selected = this._selected.asReadonly();
   readonly detailStatus = this._detailStatus.asReadonly();
-  readonly isEmpty = computed(() => this._listStatus() === 'loaded' && this._items().length === 0);
+  /** Nenhum candidato cadastrado (e não apenas uma página vazia). */
+  readonly isEmpty = computed(() => this._listStatus() === 'loaded' && this._total() === 0);
 
-  loadList(): void {
+  loadList(page = 1, pageSize: number = this.pageSizes[0]): void {
     this.listRequest?.unsubscribe();
+    this._page.set(page);
+    this._pageSize.set(pageSize);
     this._listStatus.set('loading');
-    this.listRequest = this.api.list().subscribe({
-      next: (items) => {
-        this._items.set(items);
+    this.listRequest = this.api.list(page, pageSize).subscribe({
+      next: (result) => {
+        this._items.set(result.items);
+        this._total.set(result.total);
         this._listStatus.set('loaded');
       },
       error: () => this._listStatus.set('error'),

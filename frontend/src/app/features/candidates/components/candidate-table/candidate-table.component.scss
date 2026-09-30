@@ -47,3 +47,11 @@
 .candidate-table__date {
   white-space: nowrap;
 }
+
+// Rodapé: total e seletor à esquerda, paginação à direita; no celular fica preso à área visível
+// enquanto a tabela rola na horizontal.
+.candidate-table__caption {
+  position: sticky;
+  inset-inline-start: 0;
+  max-inline-size: calc(100vw - 2rem);
+}

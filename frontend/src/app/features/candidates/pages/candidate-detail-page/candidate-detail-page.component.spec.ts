@@ -16,7 +16,13 @@ const candidate: Candidate = {
 };
 
 function fakeStore(status: 'loading' | 'loaded' | 'not-found' | 'error', selected: Candidate | null = null) {
-  return { detailStatus: signal(status), selected: signal(selected), loadById: vi.fn() };
+  return {
+    detailStatus: signal(status),
+    selected: signal(selected),
+    page: signal(1),
+    pageSize: signal(10),
+    loadById: vi.fn(),
+  };
 }
 
 async function render(store: ReturnType<typeof fakeStore>, id = '7') {
@@ -42,6 +48,15 @@ describe('CandidateDetailPageComponent', () => {
     expect(el.textContent).toContain('Candidato não encontrado. Ele pode não existir ou o link está incorreto.');
     const back = [...el.querySelectorAll('a')].find((a) => a.textContent?.trim() === 'Voltar para a lista');
     expect(back?.getAttribute('href')).toBe('/candidatos');
+  });
+
+  it('"Voltar para a lista" retorna à página e ao tamanho de página em que a pessoa estava', async () => {
+    const store = fakeStore('loaded', candidate);
+    store.page.set(3);
+    store.pageSize.set(20);
+    const el = await render(store);
+    const back = [...el.querySelectorAll('a')].find((a) => a.textContent?.trim() === 'Voltar para a lista');
+    expect(back?.getAttribute('href')).toBe('/candidatos?pagina=3&itens=20');
   });
 
   it('loaded: mostra os detalhes', async () => {

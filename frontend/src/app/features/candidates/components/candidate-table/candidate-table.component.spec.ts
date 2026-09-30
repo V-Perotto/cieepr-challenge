@@ -1,4 +1,5 @@
 import { formatDate } from '@angular/common';
+import { Component } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
 import type { CandidateSummary } from '../../../../core/models/candidate.models';
@@ -27,6 +28,21 @@ describe('CandidateTableComponent', () => {
     expect(scroll?.querySelector('table')).not.toBeNull();
     expect(scroll?.getAttribute('tabindex')).toBe('0');
     expect(scroll?.getAttribute('aria-label')).toBe('Lista de candidatos');
+  });
+
+  it('projeta o rodapé num caption[tuiCaption] (padrão "Footer" da tabela da Taiga)', async () => {
+    @Component({
+      imports: [CandidateTableComponent],
+      template: '<app-candidate-table [items]="items"><span class="rodape">25 candidatos</span></app-candidate-table>',
+    })
+    class Host {
+      readonly items = items;
+    }
+    await TestBed.configureTestingModule({ imports: [Host], providers: [provideRouter([])] }).compileComponents();
+    const fixture = TestBed.createComponent(Host);
+    await fixture.whenStable();
+    const caption = (fixture.nativeElement as HTMLElement).querySelector('table > caption[tuiCaption]');
+    expect(caption?.querySelector('.rodape')?.textContent).toBe('25 candidatos');
   });
 
   it('tem as colunas do ui-contract', async () => {

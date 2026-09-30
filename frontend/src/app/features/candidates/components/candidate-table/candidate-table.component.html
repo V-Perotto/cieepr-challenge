@@ -1,5 +1,9 @@
 <div class="candidate-table__scroll" tabindex="0" role="region" aria-label="Lista de candidatos">
   <table tuiTable class="candidate-table">
+    <!-- Rodapé no padrão "Footer" da tabela da Taiga (caption-side: bottom). -->
+    <caption tuiCaption class="candidate-table__caption">
+      <ng-content />
+    </caption>
     <thead>
       <tr tuiThGroup>
         <th tuiTh [resizable]="false">Nome</th>

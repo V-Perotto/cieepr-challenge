@@ -26,6 +26,14 @@ export interface CandidateSummary {
   createdAt: string;
 }
 
+/** Página da listagem (GET /api/candidates?page=&pageSize=). */
+export interface CandidatePage {
+  items: CandidateSummary[];
+  page: number;
+  pageSize: number;
+  total: number;
+}
+
 export interface Candidate extends CandidateSummary {
   /** Só dígitos (10 ou 11). */
   phone: string | null;

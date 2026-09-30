@@ -1,7 +1,7 @@
 <section class="page">
   <header class="page__header">
     <h1 class="page__title">Detalhes do candidato</h1>
-    <a tuiLink routerLink="/candidatos">Voltar para a lista</a>
+    <a tuiLink routerLink="/candidatos" [queryParams]="listQueryParams()">Voltar para a lista</a>
   </header>
 
   @switch (store.detailStatus()) {
@@ -13,7 +13,7 @@
     @case ('not-found') {
       <tui-block-status>
         <h2>Candidato não encontrado. Ele pode não existir ou o link está incorreto.</h2>
-        <a tuiButton routerLink="/candidatos">Voltar para a lista</a>
+        <a tuiButton routerLink="/candidatos" [queryParams]="listQueryParams()">Voltar para a lista</a>
       </tui-block-status>
     }
     @case ('error') {

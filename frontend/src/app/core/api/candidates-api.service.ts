@@ -1,7 +1,7 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import type { Observable } from 'rxjs';
-import type { Candidate, CandidateInput, CandidateSummary } from '../models/candidate.models';
+import type { Candidate, CandidateInput, CandidatePage } from '../models/candidate.models';
 
 /** Acesso HTTP a /api/candidates (contracts/openapi.yaml). */
 @Injectable({ providedIn: 'root' })
@@ -13,8 +13,9 @@ export class CandidatesApiService {
     return this.http.post<Candidate>(this.baseUrl, input);
   }
 
-  list(): Observable<CandidateSummary[]> {
-    return this.http.get<CandidateSummary[]>(this.baseUrl);
+  list(page: number, pageSize: number): Observable<CandidatePage> {
+    const params = new HttpParams().set('page', page).set('pageSize', pageSize);
+    return this.http.get<CandidatePage>(this.baseUrl, { params });
   }
 
   getById(id: number): Observable<Candidate> {
