@@ -49,7 +49,7 @@ release e a documentação inicial.
   - `devDependencies`: `semantic-release@^25.0.9`, `@semantic-release/commit-analyzer@^13.0.1`,
     `@semantic-release/release-notes-generator@^14.1.1`, `@semantic-release/changelog@^7.0.0`,
     `@semantic-release/npm@^13.2.0`, `@semantic-release/github@^12.0.10`,
-    `@semantic-release/git@^11.0.1`, `conventional-changelog-conventionalcommits@^10.4.0`,
+    `@semantic-release/git@^11.0.1`, `conventional-changelog-conventionalcommits@^9.3.1`,
     `@commitlint/cli@^21.2.3`, `@commitlint/config-conventional@^21.2.3`, `husky@^9.1.7` e
     `pdfkit@^0.20.2`.
   - **Não** incluir `standard-version` nem os scripts `release` e `prerelease` (R14).
