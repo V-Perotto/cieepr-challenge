@@ -134,7 +134,7 @@ qualquer avaliador validar a importação sem precisar de currículos próprios.
   4. Exemplos práticos de onde a IA ajudou (prompts e como as respostas foram usadas).
   5. Ajustes, correções ou descartes feitos sobre o código gerado por IA.
   6. Processo de validação e testes da solução.
-  7. Tempo estimado e tempo real dedicado ao desafio.
+  7. Tempo real (aproximado) dedicado ao desafio.
   8. Dificuldades, limitações da extração de PDF e melhorias futuras.
 - As seções 4 e 5 DEVERIAM ser preenchidas enquanto o trabalho acontece, e não reconstruídas de
   memória no final.
@@ -203,4 +203,4 @@ de execução reproduzíveis fazem parte da entrega.
   Complexity Tracking do plano. No `/speckit-analyze`, conflitos com esta constituição são
   sempre CRITICAL.
 
-**Version**: 1.1.0 | **Ratified**: 2026-09-29 | **Last Amended**: 2026-09-29
+**Version**: 1.2.0 | **Ratified**: 2026-09-29 | **Last Amended**: 2026-09-30
