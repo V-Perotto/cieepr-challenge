@@ -1,22 +1,28 @@
-<table tuiTable class="candidate-table">
-  <thead>
-    <tr tuiThGroup>
-      <th tuiTh [resizable]="false">Nome</th>
-      <th tuiTh [resizable]="false">E-mail</th>
-      <th tuiTh [resizable]="false">Área ou cargo de interesse</th>
-      <th tuiTh [resizable]="false">Cadastrado em</th>
-    </tr>
-  </thead>
-  <tbody tuiTbody>
-    @for (item of items(); track item.id) {
-      <tr class="candidate-table__row" (click)="open(item.id)">
-        <td tuiTd>
-          <a tuiLink [routerLink]="['/candidatos', item.id]" (click)="$event.stopPropagation()">{{ item.fullName }}</a>
-        </td>
-        <td tuiTd>{{ item.email }}</td>
-        <td tuiTd>{{ item.areaOfInterest ?? 'Não informado' }}</td>
-        <td tuiTd>{{ item.createdAt | date: 'dd/MM/yyyy HH:mm' }}</td>
+<div class="candidate-table__scroll" tabindex="0" role="region" aria-label="Lista de candidatos">
+  <table tuiTable class="candidate-table">
+    <thead>
+      <tr tuiThGroup>
+        <th tuiTh [resizable]="false">Nome</th>
+        <th tuiTh [resizable]="false">E-mail</th>
+        <th tuiTh [resizable]="false">Área ou cargo de interesse</th>
+        <th tuiTh [resizable]="false">Cadastrado em</th>
       </tr>
-    }
-  </tbody>
-</table>
+    </thead>
+    <tbody tuiTbody>
+      @for (item of items(); track item.id) {
+        <tr class="candidate-table__row" (click)="open(item.id)">
+          <td tuiTd>
+            <a tuiLink [routerLink]="['/candidatos', item.id]" (click)="$event.stopPropagation()">{{
+              item.fullName
+            }}</a>
+          </td>
+          <td tuiTd>{{ item.email }}</td>
+          <td tuiTd>{{ item.areaOfInterest ?? 'Não informado' }}</td>
+          <td tuiTd class="candidate-table__date">
+            {{ item.createdAt | date: 'dd/MM/yyyy HH:mm' }}
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>

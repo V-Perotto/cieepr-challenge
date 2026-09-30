@@ -21,6 +21,14 @@ describe('CandidateTableComponent', () => {
     return fixture.nativeElement as HTMLElement;
   }
 
+  it('fica dentro de um contêiner com rolagem horizontal (telas estreitas)', async () => {
+    const el = await render();
+    const scroll = el.querySelector('.candidate-table__scroll');
+    expect(scroll?.querySelector('table')).not.toBeNull();
+    expect(scroll?.getAttribute('tabindex')).toBe('0');
+    expect(scroll?.getAttribute('aria-label')).toBe('Lista de candidatos');
+  });
+
   it('tem as colunas do ui-contract', async () => {
     const el = await render();
     const headers = [...el.querySelectorAll('th')].map((th) => th.textContent?.trim());

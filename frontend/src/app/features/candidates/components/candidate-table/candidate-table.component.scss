@@ -1,3 +1,15 @@
+.candidate-table__scroll {
+  // Em telas estreitas só a tabela rola na horizontal; a página mantém a largura da tela.
+  overflow-x: auto;
+  max-width: 100%;
+  -webkit-overflow-scrolling: touch;
+
+  &:focus-visible {
+    outline: 2px solid var(--tui-border-focus);
+    outline-offset: 2px;
+  }
+}
+
 .candidate-table {
   width: 100%;
 }
@@ -8,4 +20,8 @@
   &:hover {
     background: var(--tui-background-neutral-1);
   }
+}
+
+.candidate-table__date {
+  white-space: nowrap;
 }
