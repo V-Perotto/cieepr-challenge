@@ -30,7 +30,7 @@ componente e o [quickstart](../quickstart.md) conferem os textos deste arquivo.
 | Telefone                      | `phone`               | `<tui-textfield>` + `tuiInput` + Maskito | Máscara `(00) 0000-0000` / `(00) 00000-0000` |
 | Área ou cargo de interesse    | `areaOfInterest`      | `<tui-textfield>` + `tuiInput`        | `maxlength=250`                             |
 | Resumo profissional           | `professionalSummary` | `<tui-textfield>` + `tuiTextarea`     | `maxlength=1000` (barra digitação e colagem), contador `n / 1000`; cresce com o texto de 4 a 40 linhas |
-| Currículo em PDF (opcional)   | -                     | `label[tuiInputFiles]` + `<tui-file>` | `accept="application/pdf,.pdf"`, 5 MB       |
+| Currículo em PDF (opcional)   | -                     | `label[tuiInputFiles]` + `<tui-file>` | `accept="application/pdf,.pdf"`, 5 MB; área de soltar com ícone de upload centralizado acima de "Escolha um arquivo ou arraste ele aqui" (no celular, só "Escolha um arquivo"); ao arrastar: "Solte o arquivo aqui" |
 
 Comportamento:
 - Os erros aparecem junto ao campo quando ele perde o foco e também ao tentar salvar (FR-008).
@@ -39,6 +39,7 @@ Comportamento:
 - Campos preenchidos pelo PDF recebem a indicação "Preenchido pelo currículo". Ela some quando
   a pessoa edita o campo.
 - Depois do sucesso (201), o formulário é limpo e a notificação de sucesso aparece (FR-010).
+- Todas as notificações (toasts) aparecem centralizadas no topo da tela.
 - Acessibilidade: cada rótulo aponta para o seu campo (`for`/`id`); o erro fica ligado ao campo
   por `aria-errormessage` (a Taiga sobrescreve o `aria-describedby`) junto com `aria-invalid`; o
   status da leitura do PDF usa `aria-live="polite"`.
