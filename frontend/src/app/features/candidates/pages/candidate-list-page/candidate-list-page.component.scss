@@ -1,0 +1,32 @@
+.page__header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.page__title {
+  margin: 0;
+  font: var(--tui-typography-heading-h4);
+}
+
+.page__loader {
+  padding: 3rem 0;
+}
+
+.candidates-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1rem;
+}
+
+.candidates-footer__total {
+  font: var(--tui-typography-body-s);
+  color: var(--tui-text-secondary);
+}
+
+.candidates-footer__pagination {
+  margin-inline-start: auto;
+}

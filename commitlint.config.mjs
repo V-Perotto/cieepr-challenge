@@ -1,0 +1,25 @@
+// Conventional Commits com os tipos customizados da constituição (Princípio III).
+export default {
+  extends: ['@commitlint/config-conventional'],
+  rules: {
+    'type-enum': [
+      2,
+      'always',
+      [
+        'build',
+        'chore',
+        'ci',
+        'docs',
+        'feat',
+        'fix',
+        'perf',
+        'refactor',
+        'revert',
+        'style',
+        'test',
+        'hotfix',
+        'breaking',
+      ],
+    ],
+  },
+};

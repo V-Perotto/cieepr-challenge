@@ -1,0 +1,60 @@
+<section class="page">
+  <header class="page__header">
+    <h1 class="page__title">Candidatos</h1>
+    <a tuiButton size="m" iconStart="@tui.user-plus" routerLink="/candidatos/novo">Novo candidato</a>
+  </header>
+
+  @switch (store.listStatus()) {
+    @case ('error') {
+      <tui-block-status>
+        <h2>Não foi possível carregar os candidatos. Tente novamente.</h2>
+        <button
+          tuiButton
+          type="button"
+          appearance="secondary"
+          (click)="store.loadList(store.page(), store.pageSize())"
+        >
+          Tentar de novo
+        </button>
+      </tui-block-status>
+    }
+    @case ('loaded') {
+      @if (store.isEmpty()) {
+        <tui-block-status>
+          <h2>Nenhum candidato cadastrado ainda.</h2>
+          <a tuiButton routerLink="/candidatos/novo">Cadastrar o primeiro candidato</a>
+        </tui-block-status>
+      } @else {
+        <!-- Rodapé no padrão "Footer" da tabela da Taiga UI (taiga-ui.dev/components/table#footer). -->
+        <app-candidate-table [items]="store.items()">
+          <div class="candidates-footer">
+            <span class="candidates-footer__total" aria-live="polite">{{ totalLabel() }}</span>
+            <button
+              tuiButton
+              tuiButtonSelect
+              type="button"
+              appearance="flat"
+              size="s"
+              [attr.aria-label]="'Itens por página: ' + store.pageSize()"
+              [ngModel]="store.pageSize()"
+              (ngModelChange)="changeSize($event)"
+            >
+              {{ rangeLabel() }}
+              <tui-data-list-wrapper *tuiDropdown [items]="store.pageSizes" [itemContent]="sizeContent" />
+            </button>
+            <tui-pagination
+              class="candidates-footer__pagination"
+              aria-label="Paginação da lista de candidatos"
+              [length]="store.totalPages()"
+              [index]="store.page() - 1"
+              (indexChange)="goTo($event + 1)"
+            />
+          </div>
+        </app-candidate-table>
+      }
+    }
+    @default {
+      <tui-loader class="page__loader" size="l" textContent="Carregando candidatos..." />
+    }
+  }
+</section>

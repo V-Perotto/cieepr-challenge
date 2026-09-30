@@ -1,0 +1,53 @@
+<div class="resume-upload">
+  <span class="resume-upload__label" id="resume-upload-label">Currículo em PDF (opcional)</span>
+  @if (selectedFile(); as file) {
+    <tui-files>
+      <tui-file [file]="file" (remove)="remove()" />
+    </tui-files>
+    <!-- Anexar outro PDF substitui o atual, sem precisar removê-lo antes (spec: "Um PDF por cadastro"). -->
+    <label
+      tuiButton
+      appearance="flat"
+      size="s"
+      iconStart="@tui.refresh-cw"
+      class="resume-upload__replace"
+    >
+      Trocar arquivo
+      <input
+        type="file"
+        class="resume-upload__replace-input"
+        accept="application/pdf,.pdf"
+        aria-label="Trocar o currículo em PDF"
+        aria-describedby="resume-upload-hint"
+        (change)="onReplace($event)"
+      />
+    </label>
+  } @else {
+    <label tuiInputFiles class="resume-upload__drop">
+      <input
+        tuiInputFiles
+        accept="application/pdf,.pdf"
+        aria-labelledby="resume-upload-label"
+        aria-describedby="resume-upload-hint"
+        [formControl]="control"
+        (reject)="onNativeReject($event)"
+      />
+      <ng-template let-dragged>
+        <div class="resume-upload__drop-content">
+          <tui-icon icon="@tui.cloud-upload" class="resume-upload__drop-icon" aria-hidden="true" />
+          @if (dragged) {
+            <span>Solte o arquivo aqui</span>
+          } @else {
+            <span>
+              <a tuiLink>Escolha um arquivo</a>
+              <span class="resume-upload__drop-hint"> ou arraste ele aqui</span>
+            </span>
+          }
+        </div>
+      </ng-template>
+    </label>
+  }
+  <small class="resume-upload__hint" id="resume-upload-hint"
+    >Envie um PDF de até 5 MB para preencher nome, e-mail e telefone automaticamente.</small
+  >
+</div>

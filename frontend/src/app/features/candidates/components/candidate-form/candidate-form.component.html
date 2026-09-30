@@ -1,0 +1,139 @@
+<form class="candidate-form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+  <app-resume-upload
+    (fileSelected)="onResumeSelected($event)"
+    (fileRemoved)="onResumeRemoved()"
+    (rejected)="onResumeRejected($event)"
+  />
+
+  <div class="candidate-form__resume-status" data-testid="resume-status" aria-live="polite">
+    @if (extractionMessage(); as message) {
+      <div tuiNotification size="m" [appearance]="extractionAppearance()">
+        @if (extractionStatus() === 'processing') {
+          <tui-loader class="candidate-form__resume-loader" size="s" [inheritColor]="true" />
+        }
+        {{ message }}
+      </div>
+    }
+  </div>
+
+  <div class="candidate-form__field">
+    <tui-textfield>
+      <label tuiLabel for="candidate-fullName">Nome completo *</label>
+      <input
+        tuiInput
+        formControlName="fullName"
+        id="candidate-fullName"
+        [attr.aria-errormessage]="errors().fullName ? 'candidate-fullName-error' : null"
+        autocomplete="name"
+        [attr.maxlength]="maxLength.fullName"
+      />
+    </tui-textfield>
+    @if (autofilled().has('fullName')) {
+      <span
+        tuiBadge
+        class="candidate-form__autofilled"
+        appearance="info"
+        size="s"
+        data-testid="autofilled"
+        >Preenchido pelo currículo</span
+      >
+    }
+    <tui-error id="candidate-fullName-error" [error]="errors().fullName ?? null" />
+  </div>
+
+  <div class="candidate-form__field">
+    <tui-textfield>
+      <label tuiLabel for="candidate-email">E-mail *</label>
+      <input
+        tuiInput
+        type="email"
+        formControlName="email"
+        id="candidate-email"
+        [attr.aria-errormessage]="errors().email ? 'candidate-email-error' : null"
+        autocomplete="email"
+        [attr.maxlength]="maxLength.email"
+      />
+    </tui-textfield>
+    @if (autofilled().has('email')) {
+      <span
+        tuiBadge
+        class="candidate-form__autofilled"
+        appearance="info"
+        size="s"
+        data-testid="autofilled"
+        >Preenchido pelo currículo</span
+      >
+    }
+    <tui-error id="candidate-email-error" [error]="errors().email ?? null" />
+  </div>
+
+  <div class="candidate-form__field">
+    <tui-textfield>
+      <label tuiLabel for="candidate-phone">Telefone</label>
+      <input
+        tuiInput
+        type="tel"
+        inputmode="tel"
+        formControlName="phone"
+        id="candidate-phone"
+        [attr.aria-errormessage]="errors().phone ? 'candidate-phone-error' : null"
+        autocomplete="tel"
+        placeholder="(41) 99999-9999"
+        [maskito]="phoneMask"
+      />
+    </tui-textfield>
+    @if (autofilled().has('phone')) {
+      <span
+        tuiBadge
+        class="candidate-form__autofilled"
+        appearance="info"
+        size="s"
+        data-testid="autofilled"
+        >Preenchido pelo currículo</span
+      >
+    }
+    <tui-error id="candidate-phone-error" [error]="errors().phone ?? null" />
+  </div>
+
+  <div class="candidate-form__field">
+    <tui-textfield>
+      <label tuiLabel for="candidate-areaOfInterest">Área ou cargo de interesse</label>
+      <input
+        tuiInput
+        formControlName="areaOfInterest"
+        id="candidate-areaOfInterest"
+        [attr.aria-errormessage]="errors().areaOfInterest ? 'candidate-areaOfInterest-error' : null"
+        [attr.maxlength]="maxLength.areaOfInterest"
+      />
+    </tui-textfield>
+    <tui-error id="candidate-areaOfInterest-error" [error]="errors().areaOfInterest ?? null" />
+  </div>
+
+  <div class="candidate-form__field">
+    <tui-textfield>
+      <label tuiLabel for="candidate-professionalSummary">Resumo profissional</label>
+      <textarea
+        tuiTextarea
+        formControlName="professionalSummary"
+        id="candidate-professionalSummary"
+        [attr.aria-errormessage]="
+          errors().professionalSummary ? 'candidate-professionalSummary-error' : null
+        "
+        [attr.maxlength]="maxLength.professionalSummary"
+        [limit]="maxLength.professionalSummary"
+        [min]="summaryRows.min"
+        [max]="summaryRows.max"
+      ></textarea>
+    </tui-textfield>
+    <tui-error
+      id="candidate-professionalSummary-error"
+      [error]="errors().professionalSummary ?? null"
+    />
+  </div>
+
+  <div class="candidate-form__actions">
+    <button tuiButton type="submit" iconStart="@tui.save" [disabled]="saving()">
+      {{ saving() ? 'Salvando...' : 'Salvar' }}
+    </button>
+  </div>
+</form>

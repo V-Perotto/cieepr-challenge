@@ -1,0 +1,64 @@
+.candidate-table__scroll {
+  // Em telas estreitas só a tabela rola na horizontal; a página mantém a largura da tela.
+  overflow-x: auto;
+  max-width: 100%;
+  -webkit-overflow-scrolling: touch;
+
+  &:focus-visible {
+    outline: 2px solid var(--tui-border-focus);
+    outline-offset: 2px;
+  }
+}
+
+.candidate-table {
+  width: 100%;
+  // Largura mínima para as colunas não ficarem espremidas no celular; a região acima rola.
+  min-inline-size: 40rem;
+  // Colunas com largura fixa: um texto longo quebra dentro da própria coluna, sem roubar
+  // espaço das outras (com layout automático, uma área longa espremia nome e e-mail).
+  table-layout: fixed;
+
+  th:nth-child(1) {
+    inline-size: 24%;
+  }
+
+  th:nth-child(2) {
+    inline-size: 30%;
+  }
+
+  th:nth-child(4) {
+    inline-size: 9.5rem;
+  }
+
+  // Textos longos, inclusive sem espaços, quebram dentro da célula em vez de alargar a tabela.
+  td {
+    overflow-wrap: anywhere;
+  }
+}
+
+.candidate-table__row {
+  cursor: pointer;
+
+  // A cor vai nas células: o td da Taiga pinta o próprio fundo e cobriria o da linha.
+  td {
+    transition: background-color var(--tui-duration, 0.3s);
+  }
+
+  // Destaque ao passar o mouse e ao focar o link da linha pelo teclado (#e9eef3).
+  &:hover td,
+  &:focus-within td {
+    background: var(--tui-background-elevation-2);
+  }
+}
+
+.candidate-table__date {
+  white-space: nowrap;
+}
+
+// Rodapé: total e seletor à esquerda, paginação à direita; no celular fica preso à área visível
+// enquanto a tabela rola na horizontal.
+.candidate-table__caption {
+  position: sticky;
+  inset-inline-start: 0;
+  max-inline-size: calc(100vw - 2rem);
+}

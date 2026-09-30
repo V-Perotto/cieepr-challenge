@@ -1,0 +1,30 @@
+# Versionamento SemVer automático (constituição, Princípio III): roda a cada merge no main.
+# Atenção: se a proteção de branch do main exigir PR, o GITHUB_TOKEN padrão não consegue
+# enviar o commit "chore(release)". Use um token/GitHub App com permissão de bypass (research R14).
+name: Release
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 26.10.0
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm semantic
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

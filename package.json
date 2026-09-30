@@ -1,0 +1,89 @@
+{
+  "name": "cieepr-challenge",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Cadastro e consulta de candidatos com importação de currículo em PDF (Angular + Node.js + SQL Server).",
+  "packageManager": "pnpm@11.21.0",
+  "engines": {
+    "node": ">=24.15.0"
+  },
+  "scripts": {
+    "semantic": "semantic-release --branches main",
+    "release:dry": "semantic-release --dry-run --no-ci --branches main",
+    "prepare": "husky",
+    "samples:generate": "node samples/generate-samples.mjs"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^21.2.3",
+    "@commitlint/config-conventional": "^21.2.3",
+    "@semantic-release/changelog": "^7.0.0",
+    "@semantic-release/commit-analyzer": "^13.0.1",
+    "@semantic-release/git": "^11.0.1",
+    "@semantic-release/github": "^12.0.10",
+    "@semantic-release/npm": "^13.2.0",
+    "@semantic-release/release-notes-generator": "^14.1.1",
+    "conventional-changelog-conventionalcommits": "^10.4.0",
+    "husky": "^9.1.7",
+    "pdfkit": "^0.20.2",
+    "semantic-release": "^25.0.9"
+  },
+  "release": {
+    "branches": [
+      "main"
+    ],
+    "plugins": [
+      [
+        "@semantic-release/commit-analyzer",
+        {
+          "preset": "conventionalcommits",
+          "releaseRules": [
+            { "breaking": true, "release": "major" },
+            { "type": "breaking", "release": "major" },
+            { "type": "feat", "release": "minor" },
+            { "type": "hotfix", "release": "minor" },
+            { "type": "fix", "release": "patch" },
+            { "type": "perf", "release": "patch" }
+          ]
+        }
+      ],
+      [
+        "@semantic-release/release-notes-generator",
+        {
+          "preset": "conventionalcommits",
+          "presetConfig": {
+            "types": [
+              { "type": "breaking", "section": "Mudanças incompatíveis" },
+              { "type": "feat", "section": "Funcionalidades" },
+              { "type": "hotfix", "section": "Hotfixes" },
+              { "type": "fix", "section": "Correções" },
+              { "type": "perf", "section": "Performance" }
+            ]
+          }
+        }
+      ],
+      [
+        "@semantic-release/changelog",
+        {
+          "changelogFile": "CHANGELOG.md"
+        }
+      ],
+      [
+        "@semantic-release/npm",
+        {
+          "npmPublish": false
+        }
+      ],
+      "@semantic-release/github",
+      [
+        "@semantic-release/git",
+        {
+          "assets": [
+            "CHANGELOG.md",
+            "package.json"
+          ],
+          "message": "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
+        }
+      ]
+    ]
+  }
+}

@@ -1,0 +1,59 @@
+.resume-upload {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.resume-upload__label {
+  font: var(--tui-typography-body-m);
+  font-weight: 600;
+}
+
+.resume-upload__hint {
+  font: var(--tui-typography-body-s);
+  color: var(--tui-text-secondary);
+}
+
+// Área de soltar mais espaçosa, com o ícone centralizado acima do texto.
+// O seletor inclui label[tuiInputFiles] para vencer a regra [data-size] da Taiga sem !important.
+label[tuiInputFiles].resume-upload__drop {
+  min-block-size: 9rem;
+  padding: 1.75rem 1.5rem;
+}
+
+.resume-upload__drop-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  text-align: center;
+}
+
+.resume-upload__drop-icon {
+  inline-size: 2.5rem;
+  block-size: 2.5rem;
+  font-size: 2.5rem;
+  color: var(--tui-text-action);
+}
+
+// No celular não há arrastar-e-soltar: fica só "Escolha um arquivo".
+@media (max-width: 36rem) {
+  .resume-upload__drop-hint {
+    display: none;
+  }
+}
+
+// "Trocar arquivo": o input fica sobre o botão, invisível, para abrir o seletor nativo.
+.resume-upload__replace {
+  position: relative;
+  align-self: flex-start;
+  overflow: hidden;
+}
+
+.resume-upload__replace-input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
