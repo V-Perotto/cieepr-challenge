@@ -40,6 +40,13 @@ Comportamento:
   a pessoa edita o campo.
 - Depois do sucesso (201), o formulário é limpo e a notificação de sucesso aparece (FR-010).
 - Todas as notificações (toasts) aparecem centralizadas no topo da tela.
+- Ícones nos botões principais: "Novo candidato" com `@tui.user-plus` e "Salvar" com `@tui.save`
+  (`iconStart` do `tuiButton`).
+- Cores: paleta CIEE sobre os tokens da Taiga UI 5 (`frontend/src/styles.scss`), com azul
+  `#00458c` nas ações primárias e links (hover do link em laranja `#e86c00`), laranja `#e86c00`
+  como destaque secundário (não aplicado em elementos), textos `#2b2b2b`/`#555555` e erros em
+  `#d13438`. Fundo da página `#f4f7fa`; linhas da listagem destacadas em `#e9eef3` no hover e no
+  foco pelo teclado.
 - Acessibilidade: cada rótulo aponta para o seu campo (`for`/`id`); o erro fica ligado ao campo
   por `aria-errormessage` (a Taiga sobrescreve o `aria-describedby`) junto com `aria-invalid`; o
   status da leitura do PDF usa `aria-live="polite"`.
