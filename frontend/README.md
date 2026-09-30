@@ -9,5 +9,5 @@ Comandos úteis (pnpm 11.21.0):
 pnpm install
 pnpm start                  # ng serve em http://localhost:4200 (proxy /api → localhost:3000)
 pnpm build                  # build de produção em dist/frontend/browser
-pnpm test --watch=false     # testes unitários (Vitest + jsdom)
+pnpm test     # testes unitários (Vitest + jsdom)
 ```
