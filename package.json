@@ -1,6 +1,6 @@
 {
   "name": "cieepr-challenge",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "private": true,
   "description": "Cadastro e consulta de candidatos com importação de currículo em PDF (Angular + Node.js + SQL Server).",
   "packageManager": "pnpm@11.21.0",
@@ -37,12 +37,30 @@
         {
           "preset": "conventionalcommits",
           "releaseRules": [
-            { "breaking": true, "release": "major" },
-            { "type": "breaking", "release": "major" },
-            { "type": "feat", "release": "minor" },
-            { "type": "hotfix", "release": "minor" },
-            { "type": "fix", "release": "patch" },
-            { "type": "perf", "release": "patch" }
+            {
+              "breaking": true,
+              "release": "major"
+            },
+            {
+              "type": "breaking",
+              "release": "major"
+            },
+            {
+              "type": "feat",
+              "release": "minor"
+            },
+            {
+              "type": "hotfix",
+              "release": "minor"
+            },
+            {
+              "type": "fix",
+              "release": "patch"
+            },
+            {
+              "type": "perf",
+              "release": "patch"
+            }
           ]
         }
       ],
@@ -52,11 +70,26 @@
           "preset": "conventionalcommits",
           "presetConfig": {
             "types": [
-              { "type": "breaking", "section": "Mudanças incompatíveis" },
-              { "type": "feat", "section": "Funcionalidades" },
-              { "type": "hotfix", "section": "Hotfixes" },
-              { "type": "fix", "section": "Correções" },
-              { "type": "perf", "section": "Performance" }
+              {
+                "type": "breaking",
+                "section": "Mudanças incompatíveis"
+              },
+              {
+                "type": "feat",
+                "section": "Funcionalidades"
+              },
+              {
+                "type": "hotfix",
+                "section": "Hotfixes"
+              },
+              {
+                "type": "fix",
+                "section": "Correções"
+              },
+              {
+                "type": "perf",
+                "section": "Performance"
+              }
             ]
           }
         }
