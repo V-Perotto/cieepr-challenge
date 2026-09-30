@@ -9,7 +9,7 @@ import {
   signal,
 } from '@angular/core';
 import { provideRouter, withComponentInputBinding } from '@angular/router';
-import { provideTaiga } from '@taiga-ui/core';
+import { provideTaiga, tuiNotificationOptionsProvider } from '@taiga-ui/core';
 import { TUI_LANGUAGE } from '@taiga-ui/i18n';
 import { TUI_PORTUGUESE_LANGUAGE } from '@taiga-ui/i18n/languages/portuguese';
 import { routes } from './app.routes';
@@ -23,6 +23,8 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes, withComponentInputBinding()),
     provideHttpClient(withFetch()),
     provideTaiga(),
+    // Todas as notificações (toasts) aparecem centralizadas no topo da tela.
+    tuiNotificationOptionsProvider({ block: 'start', inline: 'center' }),
     { provide: LOCALE_ID, useValue: 'pt-BR' },
     { provide: TUI_LANGUAGE, useValue: signal(TUI_PORTUGUESE_LANGUAGE) },
   ],

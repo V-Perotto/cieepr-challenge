@@ -30,6 +30,17 @@ describe('ResumeUploadComponent', () => {
     expect(input!.accept).toContain('application/pdf');
   });
 
+  it('mostra um ícone de envio centralizado acima do texto da área de soltar', () => {
+    const el = fixture.nativeElement as HTMLElement;
+    const content = el.querySelector('label[tuiInputFiles] .resume-upload__drop-content');
+    expect(content).not.toBeNull();
+    const [first, second] = [...content!.children];
+    expect(first!.tagName.toLowerCase()).toBe('tui-icon');
+    expect(first!.getAttribute('icon')).toBe('@tui.cloud-upload');
+    expect(first!.getAttribute('aria-hidden')).toBe('true');
+    expect(second!.textContent?.replace(/\s+/g, ' ').trim()).toBe('Escolha um arquivo ou arraste ele aqui');
+  });
+
   it.each([
     ['curriculo.docx', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'],
     ['foto.jpg', 'image/jpeg'],

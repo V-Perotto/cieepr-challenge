@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, output, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import { TuiIcon, TuiLink } from '@taiga-ui/core';
 import { TuiFiles } from '@taiga-ui/kit';
 import { pdfFileProblem } from '../../validation/pdf-file';
 import { RESUME_MESSAGES } from '../../validation/resume-messages';
@@ -8,7 +9,7 @@ import { RESUME_MESSAGES } from '../../validation/resume-messages';
 /** Seleção opcional do currículo em PDF, com checagem de tipo e tamanho antes do envio. */
 @Component({
   selector: 'app-resume-upload',
-  imports: [ReactiveFormsModule, TuiFiles],
+  imports: [ReactiveFormsModule, TuiFiles, TuiIcon, TuiLink],
   templateUrl: './resume-upload.component.html',
   styleUrl: './resume-upload.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

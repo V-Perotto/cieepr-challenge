@@ -5,7 +5,7 @@
       <tui-file [file]="file" (remove)="remove()" />
     </tui-files>
   } @else {
-    <label tuiInputFiles>
+    <label tuiInputFiles class="resume-upload__drop">
       <input
         tuiInputFiles
         accept="application/pdf,.pdf"
@@ -14,6 +14,19 @@
         [formControl]="control"
         (reject)="onNativeReject($event)"
       />
+      <ng-template let-dragged>
+        <div class="resume-upload__drop-content">
+          <tui-icon icon="@tui.cloud-upload" class="resume-upload__drop-icon" aria-hidden="true" />
+          @if (dragged) {
+            <span>Solte o arquivo aqui</span>
+          } @else {
+            <span>
+              <a tuiLink>Escolha um arquivo</a>
+              <span class="resume-upload__drop-hint"> ou arraste ele aqui</span>
+            </span>
+          }
+        </div>
+      </ng-template>
     </label>
   }
   <small class="resume-upload__hint" id="resume-upload-hint"
