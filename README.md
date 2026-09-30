@@ -52,6 +52,9 @@ trabalho foi feito está em [`DESENVOLVIMENTO.md`](DESENVOLVIMENTO.md).
 
 ## Executar com Docker Compose (aplicação completa)
 
+**Pré-requisitos**: Docker com Compose v2; host x86_64 (ou emulação no ARM); portas 1433,
+3000 e 4200 livres (detalhes em [Pré-requisitos](#pré-requisitos)).
+
 ```bash
 git clone git@github.com:V-Perotto/cieepr-challenge.git
 cd cieepr-challenge
@@ -73,6 +76,17 @@ ficarem `healthy` (`docker compose ps`):
 O banco `recrutamento` e a tabela de candidatos são criados automaticamente pelo backend na
 inicialização (`backend/db/migrations/`). Não há nenhum passo manual de SQL.
 
+**Testes** (em containers, sem Node local; os PDFs de `samples/` são montados para os testes
+de integração do backend):
+
+```bash
+docker build --target test -t cieepr-backend-test ./backend
+docker run --rm -v "$PWD/samples:/samples:ro" cieepr-backend-test
+
+docker build --target test -t cieepr-frontend-test ./frontend
+docker run --rm cieepr-frontend-test
+```
+
 Para encerrar:
 
 ```bash
@@ -85,6 +99,9 @@ docker compose down -v     # apaga também o banco
 Os comandos abaixo são executados na raiz do repositório, depois do `cp .env.example .env`.
 
 ### Backend (API)
+
+**Pré-requisitos**: Docker; host x86_64 (ou emulação no ARM) para o SQL Server; portas 1433 e
+3000 livres; `.env` copiado do `.env.example`.
 
 O backend precisa de um SQL Server. Suba um numa rede Docker e depois a API na mesma rede:
 
@@ -102,10 +119,22 @@ docker run -d --name cieepr-backend --network cieepr-net --network-alias backend
 curl http://localhost:3000/api/health   # {"status":"ok","database":"up"} após ~20 s
 ```
 
-As migrations rodam na inicialização. Se o banco ainda estiver subindo, o backend tenta
-conectar de novo por até 60 s.
+A API fica em <http://localhost:3000>, com os endpoints em `/api` (contrato em
+[`openapi.yaml`](specs/001-candidate-registration/contracts/openapi.yaml)). As migrations rodam
+na inicialização. Se o banco ainda estiver subindo, o backend tenta conectar de novo por até
+60 s.
+
+**Testes do backend** (unitários, HTTP e de integração com os PDFs de `samples/`):
+
+```bash
+docker build --target test -t cieepr-backend-test ./backend
+docker run --rm -v "$PWD/samples:/samples:ro" cieepr-backend-test
+```
 
 ### Frontend (SPA + Nginx)
+
+**Pré-requisitos**: Docker; porta 4200 livre; a API do roteiro anterior rodando na rede
+`cieepr-net`.
 
 O Nginx do frontend encaminha `/api/` para o host **`backend:3000`**. Para rodar a imagem
 sozinha, coloque-a na mesma rede de um container acessível como `backend`, como o do exemplo
@@ -116,7 +145,16 @@ docker build -t cieepr-frontend ./frontend
 docker run -d --name cieepr-frontend --network cieepr-net -p 4200:80 cieepr-frontend
 ```
 
-Acesse <http://localhost:4200>. Para limpar esse cenário:
+Acesse <http://localhost:4200>.
+
+**Testes do frontend** (componentes, store e validadores, com Vitest + jsdom):
+
+```bash
+docker build --target test -t cieepr-frontend-test ./frontend
+docker run --rm cieepr-frontend-test
+```
+
+Para limpar esse cenário:
 
 ```bash
 docker rm -f cieepr-frontend cieepr-backend cieepr-db && docker network rm cieepr-net
@@ -146,9 +184,11 @@ O roteiro completo de validação, com todos os cenários de aceite, está em
 
 ## Testes automatizados
 
+Em containers, conforme os roteiros acima, ou localmente, com Node.js e pnpm:
+
 ```bash
 cd backend && pnpm install && pnpm build && pnpm test
-cd ../frontend && pnpm install && pnpm build && pnpm test --watch=false
+cd ../frontend && pnpm install && pnpm build && pnpm test
 ```
 
 - **Backend**: testes unitários dos services, do parser de currículo e das regras de
@@ -169,6 +209,14 @@ em `dev` e em Pull Requests para `main`.
 - A cada merge no `main`, o [`release.yml`](.github/workflows/release.yml) roda o
   `semantic-release`, que calcula a versão SemVer, atualiza o `CHANGELOG.md` e o
   `package.json` da raiz e cria o release no GitHub (sem publicar no npm).
+- **Depois de cada release**, faça o merge do `main` de volta em `dev`. Assim o commit
+  `chore(release)` (com o `CHANGELOG.md` e a versão) chega a `dev` e o próximo PR não tem
+  conflitos:
+
+  ```bash
+  git checkout dev && git pull && git fetch origin && git merge origin/main && git push
+  ```
+
 - Para ver localmente a próxima versão, sem gravar nada: `pnpm install && pnpm release:dry`.
 
 ## Solução de problemas

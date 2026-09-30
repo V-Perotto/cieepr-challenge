@@ -144,6 +144,17 @@ das ferramentas:
 | Healthcheck do SQL Server com dois caminhos possíveis do `sqlcmd` | O caminho `/opt/mssql-tools18/bin/sqlcmd` foi confirmado na imagem 2025, e o healthcheck foi simplificado |
 | Instrução do README para rodar o frontend sozinho (`docker network connect --alias`) falharia com o container já conectado | Uso de `--network-alias backend` no `docker run` do backend. Os dois roteiros foram executados e validados |
 
+**Correções vindas do `/speckit-analyze`**, a análise de consistência feita depois da
+implementação:
+
+| Problema encontrado | Correção |
+|---------------------|----------|
+| O health check executava `SELECT 1` no `server.ts`, fora da camada de repositório, contrariando a regra da constituição (Princípio V) | Criados o `HealthService` e o `DatabaseHealthRepository`: o health segue Controller → Service → Repository, com testes unitários do service |
+| Os roteiros do README não traziam pré-requisitos nem testes próprios, como exige a constituição (Princípio VII) | Pré-requisitos e testes em cada roteiro. Os testes rodam em containers (estágio `test` nos Dockerfiles), sem precisar de Node local |
+| A constituição exige o merge do `main` de volta em `dev` depois de cada release, e isso não estava documentado | Comando incluído na seção de release do README |
+| No frontend, `pnpm test` travava num terminal interativo: o Angular CLI perguntava sobre telemetria e depois entrava em modo watch | `"cli": { "analytics": false }` no `angular.json`, e `test` passou a ser execução única (`test:watch` para o modo contínuo) |
+| O SC-008 (desempenho da listagem) não tinha um roteiro de verificação | Novo passo 4.1 no quickstart, executado exatamente como está escrito |
+
 **Falsos alarmes investigados e descartados**: duas falhas do roteiro E2E (erros que
 "não apareciam" e mensagens antigas depois do PDF) eram só o roteiro lendo a tela antes do
 ciclo de renderização zoneless. O estado dos controles já estava correto no mesmo instante.
@@ -156,12 +167,13 @@ Resultados da validação final, feita em 2026-09-29 a partir de um ambiente zer
 | Gate / verificação | Resultado |
 |--------------------|-----------|
 | Build TypeScript `strict`: backend (`tsc`) e frontend (`ng build`) | ✅ sem erros |
-| Testes do backend (Vitest + supertest) | ✅ **99 testes**, 11 arquivos |
+| Testes do backend (Vitest + supertest) | ✅ **102 testes**, 12 arquivos |
 | Testes do frontend (Vitest + jsdom) | ✅ **83 testes**, 12 arquivos (cada componente com seu `*.spec.ts`) |
 | `docker compose up --build` do zero | ✅ os 3 containers saudáveis em **28 s** (com imagens em cache), migration aplicada automaticamente |
 | Roteiro E2E no navegador (Playwright + Chromium, contra o compose) | ✅ **28/28** verificações |
 | Roteiro do [quickstart.md](specs/001-candidate-registration/quickstart.md) (API e interface) | ✅ todos os cenários |
 | Roteiros do README para rodar backend e frontend separadamente | ✅ executados como estão escritos |
+| Testes em containers (`docker build --target test`), sem Node local | ✅ 102 no backend e 83 no frontend |
 | Commitlint (`hotfix`/`breaking` aceitos, mensagem livre recusada) e `pnpm release:dry` | ✅ |
 | Revisão de segurança: sem segredos versionados, `.env` ignorado, sem `X-Powered-By`, nenhum PDF gravado em disco, logs sem dados pessoais | ✅ |
 

@@ -156,13 +156,15 @@ specs/001-candidate-registration/
 │   │   │   └── health.controller.ts
 │   │   ├── services/
 │   │   │   ├── candidate.service.ts
+│   │   │   ├── health.service.ts
 │   │   │   └── resume-extraction.service.ts
 │   │   ├── extraction/
 │   │   │   ├── pdf-text-extractor.ts        # interface + UnpdfTextExtractor
 │   │   │   └── resume-field-parser.ts       # heurísticas puras (research R4)
 │   │   ├── repositories/
 │   │   │   ├── candidate.repository.ts      # interface
-│   │   │   └── mssql-candidate.repository.ts
+│   │   │   ├── mssql-candidate.repository.ts
+│   │   │   └── database-health.repository.ts # ping do health check
 │   │   ├── domain/
 │   │   │   ├── candidate.ts                 # tipos de domínio e DTOs
 │   │   │   ├── candidate-input.schema.ts    # regras do data-model, seção 2

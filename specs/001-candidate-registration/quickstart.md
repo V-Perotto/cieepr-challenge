@@ -75,6 +75,30 @@ curl -s -X POST http://localhost:3000/api/candidates -H 'Content-Type: applicati
 | Clicar em uma linha                                           | Detalhes com todos os campos, acentos e quebras de linha intactos |
 | Abrir `/candidatos/999999`                                    | "Candidato não encontrado..." e o botão de voltar               |
 
+### 4.1 Desempenho da listagem (SC-008)
+
+Inserir 1.000 candidatos de carga, medir a listagem pelo Nginx e remover a carga:
+
+```bash
+SQL='/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "$MSSQL_SA_PASSWORD" -C -d recrutamento -b -Q'
+
+docker compose exec -T db bash -c "$SQL \"SET NOCOUNT ON;
+  INSERT INTO dbo.Candidates (FullName, Email, AreaOfInterest)
+  SELECT TOP (1000) CONCAT(N'Carga ', n), CONCAT(N'carga', n, N'@example.com'), N'Teste de volume'
+  FROM (SELECT ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) AS n
+        FROM sys.all_objects a CROSS JOIN sys.all_objects b) t;\""
+
+for i in 1 2 3; do
+  curl -s -o /dev/null -w 'GET /api/candidates: %{time_total}s\n' http://localhost:4200/api/candidates
+done
+
+docker compose exec -T db bash -c "$SQL \"DELETE FROM dbo.Candidates WHERE Email LIKE N'carga%@example.com';\""
+```
+
+**Esperado**: cada chamada abaixo de **2 s**. Medido em 2026-09-29: cerca de 0,02 s com 1.002
+candidatos. Com os dados de carga ainda no banco, abrir `/candidatos` no navegador também
+deve mostrar a lista em até 2 s.
+
 ## 5. Cadastro com PDF (História 3, FR-014 a FR-024, SC-002 a SC-005)
 
 Use os arquivos de `samples/`. O resultado esperado de cada um está em `samples/README.md`

@@ -244,17 +244,20 @@ release e a documentação inicial.
     "Alguns campos precisam de correção.".
   - Qualquer outro erro → registrar no log e responder 500 `INTERNAL_ERROR`, mensagem "Não foi
     possível concluir a operação agora. Tente novamente em instantes.".
-- [X] T020 Criar `backend/src/controllers/health.controller.ts` e `backend/src/app.ts`:
+- [X] T020 Criar `backend/src/controllers/health.controller.ts`, `backend/src/services/health.service.ts`,
+  `backend/src/repositories/database-health.repository.ts` e `backend/src/app.ts`:
   - `createApp(deps: AppDependencies)`: desativa `x-powered-by`, usa `express.json({ limit:
     '100kb' })` e `pino-http`, monta `GET /api/health` e registra o error handler por último.
-  - `AppDependencies` começa com `{ logger, checkDatabase: () => Promise<boolean> }`, e as
-    histórias acrescentam os services.
+  - `AppDependencies` começa com `{ logger, healthService }`, e as histórias acrescentam os
+    services.
+  - A checagem segue Controller → `HealthService.isDatabaseUp()` → `DatabaseHealthRepository.ping()`
+    (`SELECT 1`). Só o repositório executa SQL (constituição, Princípio V).
   - `GET /api/health` responde 200 `{status:'ok', database:'up'}` ou 503
     `DATABASE_UNAVAILABLE`.
 - [X] T021 Criar `backend/src/server.ts`, que faz o bootstrap nesta ordem: `loadConfig` →
   `createLogger` → `connectWithRetry` → `runMigrations` (se falhar: log e `process.exit(1)`) →
-  montagem das dependências → `createApp` → `listen(PORT)`. Em `SIGTERM` e `SIGINT`, fecha o
-  servidor HTTP e o pool.
+  montagem das dependências (repositórios MSSQL → services) → `createApp` → `listen(PORT)`. Em
+  `SIGTERM` e `SIGINT`, fecha o servidor HTTP e o pool.
 - [X] T022 [P] Criar `backend/Dockerfile` multi-stage (R1):
   - `base`: `node:26.10-bookworm-slim` + `RUN npm install -g pnpm@11.21.0` + `WORKDIR /app`.
   - `deps`: copia `package.json` e `pnpm-lock.yaml` e roda `pnpm install --frozen-lockfile`.
