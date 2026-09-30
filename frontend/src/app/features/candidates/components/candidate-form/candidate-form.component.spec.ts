@@ -198,8 +198,10 @@ describe('CandidateFormComponent', () => {
     expect(button.disabled).toBe(false);
   });
 
-  it('o botão Salvar começa habilitado', () => {
-    expect(el.querySelector<HTMLButtonElement>('button[type="submit"]')!.disabled).toBe(false);
+  it('o botão Salvar começa habilitado e tem o ícone de salvar', () => {
+    const button = el.querySelector<HTMLButtonElement>('button[type="submit"]')!;
+    expect(button.disabled).toBe(false);
+    expect(button.getAttribute('iconStart')).toBe('@tui.save');
   });
 
   describe('Resumo profissional', () => {

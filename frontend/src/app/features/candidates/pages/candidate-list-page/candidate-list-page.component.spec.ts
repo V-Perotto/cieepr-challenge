@@ -60,6 +60,7 @@ describe('CandidateListPageComponent', () => {
     expect(store.loadList).toHaveBeenCalledWith(1, 10);
     const link = [...el.querySelectorAll('a')].find((a) => a.textContent?.trim() === 'Novo candidato');
     expect(link?.getAttribute('href')).toBe('/candidatos/novo');
+    expect(link?.getAttribute('iconStart')).toBe('@tui.user-plus');
   });
 
   it('carrega a página e o tamanho indicados em ?pagina=&itens=', async () => {
